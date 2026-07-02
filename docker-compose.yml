@@ -1,0 +1,62 @@
+name: curso-fastapi
+
+services:
+    postgres:
+        image: postgres:15
+        container_name: curso-fastapi-postgres
+        restart: unless-stopped
+        environment:
+            POSTGRES_DB: fastapi
+            POSTGRES_USER: fastapi
+            POSTGRES_PASSWORD: secret
+        ports:
+            - "5434:5432"
+        volumes:
+            - curso_fastapi_pgdata:/var/lib/postgresql/data
+        networks:
+            - curso_fastapi_net
+
+    node:
+        build:
+            context: ./docker/node
+        container_name: curso-fastapi-node
+        working_dir: /app
+        volumes:
+            - ./node:/app
+            - /app/node_modules
+        ports:
+            - "5174:5173"
+        depends_on:
+            - postgres
+        networks:
+            - curso_fastapi_net
+
+    python:
+        build:
+            context: ./docker/python
+        container_name: curso-fastapi-python
+        working_dir: /usr/src/app
+        volumes:
+            - ./python:/usr/src/app
+        command: tail -f /dev/null
+        ports:
+            - "8050:8050"
+        depends_on:
+            - postgres
+        networks:
+            - curso_fastapi_net
+
+    localstack:
+        image: localstack/localstack:latest
+        container_name: curso-fastapi-localstack
+        ports:
+            - "8001:4566"
+        networks:
+            - curso_fastapi_net
+
+networks:
+    curso_fastapi_net:
+        driver: bridge
+
+volumes:
+    curso_fastapi_pgdata:
