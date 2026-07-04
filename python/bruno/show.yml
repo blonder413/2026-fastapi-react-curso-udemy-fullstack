@@ -1,10 +1,10 @@
 info:
-  name: delete
+  name: show
   type: http
   seq: 5
 
 http:
-  method: DELETE
+  method: get
   url: http://localhost:8050/ejemplo/413
 
 settings:

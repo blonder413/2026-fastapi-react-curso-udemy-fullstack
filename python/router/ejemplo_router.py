@@ -12,6 +12,13 @@ async def index():
     )
 
 
+@router.get("/{id}")
+async def show(id: int):
+    return JSONResponse(
+        status_code=status.HTTP_200_OK, content={"status": "ok", "message": {"id": id}}
+    )
+
+
 @router.post("/")
 async def create():
     return JSONResponse(
@@ -19,15 +26,16 @@ async def create():
     )
 
 
-@router.put("/")
-async def update():
+@router.put("/{id}")
+async def update(id: int):
     return JSONResponse(
-        status_code=status.HTTP_200_OK, content={"status": "ok", "message": "PUT"}
+        status_code=status.HTTP_200_OK, content={"status": "ok", "message": f"PUT {id}"}
     )
 
 
-@router.delete("/")
-async def destroy():
+@router.delete("/{id}")
+async def destroy(id: int):
     return JSONResponse(
-        status_code=status.HTTP_200_OK, content={"status": "ok", "message": "DELETE"}
+        status_code=status.HTTP_200_OK,
+        content={"status": "ok", "message": f"DELETE {id}"},
     )
