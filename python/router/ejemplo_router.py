@@ -37,6 +37,7 @@ async def json_body(dto: EjemploDto):
                 "name": dto.name,
                 "description": dto.description,
                 "alive": dto.alive,
+                "age": dto.age,
             },
         },
     )
