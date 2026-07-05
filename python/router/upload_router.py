@@ -1,5 +1,5 @@
-from fastapi import APIRouter, status, Form, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, status, Form, Query, UploadFile
+from fastapi.responses import JSONResponse, FileResponse
 from typing import Annotated
 import os
 import uuid
@@ -78,3 +78,16 @@ async def local(file: UploadFile):
             },
         },
     )
+
+
+@router.get("/get-file")
+async def get_file(id: str = Query(..., description="Filename")):
+    if not os.path.exists(f"uploads/{id}"):
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "status": status.HTTP_404_NOT_FOUND,
+                "response": {"message": "File Not Found"},
+            },
+        )
+    return FileResponse(f"uploads/{id}")
