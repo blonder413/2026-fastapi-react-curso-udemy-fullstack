@@ -1,6 +1,7 @@
 from fastapi import FastAPI, status, Request
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from fastapi.exceptions import RequestValidationError
 
 from router.ejemplo_router import router as ejemplo_router
 from router.upload_router import router as upload_router
@@ -45,4 +46,34 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     return JSONResponse(
         status_code=exc.status_code,
         content={"status": exc.status_code, "message": str(exc.detail)},
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def handle_validation_error(request: Request, exc: RequestValidationError):
+    custom_errors = []
+    for error in exc.errors():
+        field = error["loc"][-1]
+        message = error["msg"]
+
+        if message.startswith("Value error, "):
+            try:
+                _, custom_msg = eval(error["input"])
+                message = custom_msg
+            except:
+                pass
+        elif message == "Input sould be a valid integer":
+            message = f"Field {field} must be an integer"
+        elif message == "Field required":
+            message = f"Field {field} is required"
+
+        custom_errors.append({"field": field, "message": message})
+
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={
+            "status": "error",
+            "errors": custom_errors,
+            "message": "Validation errors",
+        },
     )
