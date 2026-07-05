@@ -1,0 +1,28 @@
+info:
+  name: upload file
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: http://localhost:8050/upload/file
+  headers:
+    - name: Content-Type
+      value: multipart/form-data
+  body:
+    type: multipart-form
+    data:
+      - name: id
+        type: text
+        value: "11"
+      - name: file
+        type: file
+        value:
+          - /home/blonder413/Imágenes/logo2026.png
+        contentType: image/png
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
