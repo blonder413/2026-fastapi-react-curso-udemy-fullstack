@@ -6,11 +6,16 @@ from fastapi.exceptions import RequestValidationError
 from router.ejemplo_router import router as ejemplo_router
 from router.upload_router import router as upload_router
 
+from dotenv import load_dotenv
+load_dotenv()
+import os
+
 app = FastAPI()
 
 
 @app.get("/")
 def index():
+    print(f"El valor de AWS_REGION es: {os.getenv('AWS_REGION')}")
     return {"message": "Hello World"}
 
 
