@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from router.ejemplo_router import router as ejemplo_router
+from router.upload_router import router as upload_router
 
 app = FastAPI()
 
@@ -17,6 +18,10 @@ def json_response():
     return JSONResponse(
         status_code=status.HTTP_200_OK, content={"message": "It's work"}
     )
+
+
+app.include_router(ejemplo_router)
+app.include_router(upload_router)
 
 
 @app.exception_handler(status.HTTP_404_NOT_FOUND)
@@ -41,6 +46,3 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         status_code=exc.status_code,
         content={"status": exc.status_code, "message": str(exc.detail)},
     )
-
-
-app.include_router(ejemplo_router)

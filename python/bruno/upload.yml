@@ -1,0 +1,23 @@
+info:
+  name: upload
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: http://localhost:8050/upload/
+  headers:
+    - name: Content-Type
+      value: multipart/form-data
+  body:
+    type: multipart-form
+    data:
+      - name: id
+        type: text
+        value: "11"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
