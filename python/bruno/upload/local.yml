@@ -18,8 +18,8 @@ http:
       - name: file
         type: file
         value:
-          - /home/blonder413/Imágenes/btn_donateCC_LG.gif
-        contentType: image/gif
+          - /home/blonder413/Imágenes/logo2026.png
+        contentType: image/png
 
 settings:
   encodeUrl: true
