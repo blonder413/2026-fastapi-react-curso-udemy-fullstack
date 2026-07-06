@@ -25,10 +25,17 @@ docker exec -it curso-fastapi-localstack awslocal s3 ls
 ```
 
 ## Create bucket on localstack
+
 ```bash
 # inside container
 awslocal s3 mb s3://curso-udemy
 
 # or outside container
 docker exec -it curso-fastapi-localstack awslocal s3 mb s3://curso-udemy
+```
+
+# Lists elements in S3 bucket
+
+```bash
+docker exec -it curso-fastapi-localstack awslocal s3 ls s3://curso-udemy --recursive
 ```

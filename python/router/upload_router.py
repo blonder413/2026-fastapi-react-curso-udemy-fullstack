@@ -20,6 +20,7 @@ s3_client = boto3.client(
     endpoint_url=os.getenv("AWS_SECRET_ACCESS_URL"),
 )
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
+AWS_BUCKET_URL = os.getenv("AWS_BUCKET_URL")
 
 
 @router.post("/")
@@ -106,3 +107,59 @@ async def get_file(id: str = Query(..., description="Filename")):
             },
         )
     return FileResponse(f"uploads/{id}")
+
+
+@router.post("/s3")
+async def s3(file: UploadFile):
+    if file.content_type == "image/jpeg":
+        extension = "jpg"
+    elif file.content_type == "image/png":
+        extension = "png"
+    else:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": "Invalid file",
+                },
+                "response": {},
+            },
+        )
+
+    name = f"{uuid.uuid4()}.{extension}"
+    try:
+        s3_client.upload_fileobj(
+            file.file,
+            S3_BUCKET_NAME,
+            f"files/{name}",
+            ExtraArgs={"ContentType": file.content_type},
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": str(e),
+                },
+                "response": {},
+            },
+        )
+
+    file_url = f"{AWS_BUCKET_URL}/{S3_BUCKET_NAME}/files/{name}"
+
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content={
+            "status": {"status_code": status.HTTP_201_CREATED, "message": "uploaded"},
+            "response": {
+                "content_type": file.content_type,
+                "extension": extension,
+                "filename": file.filename,
+                "name": name,
+                "size": file.size,
+                "url": file_url,
+            },
+        },
+    )
