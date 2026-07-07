@@ -163,3 +163,60 @@ async def s3(file: UploadFile):
             },
         },
     )
+
+
+@router.delete("/s3")
+async def remove(filename: str = Query(..., description="filename")):
+    try:
+        s3_client.head_object(Bucket=S3_BUCKET_NAME, Key=f"files/{filename}")
+    except s3_client.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "404":
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={
+                    "status": {
+                        "status_code": status.HTTP_404_NOT_FOUND,
+                        "message": f"{e.response['Error']['Message']}",
+                    }
+                },
+            )
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": "Ocurrió un error inesperado",
+                }
+            },
+        )
+
+    try:
+        s3_client.delete_object(Bucket=S3_BUCKET_NAME, Key=f"files/{filename}")
+    except s3_client.exceptions.ClientError as e:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "status": {
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "message": f"{e.response['Error']['Message']}",
+                }
+            },
+        )
+    except Exception:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": "Ocurrió un error inesperado al borrar el archivo",
+                }
+            },
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "status": {"status_code": status.HTTP_200_OK},
+            "response": {"message": f"File {filename} deleted"},
+        },
+    )

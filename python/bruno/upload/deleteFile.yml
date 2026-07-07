@@ -1,0 +1,21 @@
+info:
+  name: deleteFile
+  type: http
+  seq: 6
+
+http:
+  method: DELETE
+  url: http://localhost:8050/upload/s3?filename=9374c69a-3e84-4c32-a8a5-67dcc1cb7d3d.png
+  headers:
+    - name: Content-Type
+      value: multipart/form-data
+  params:
+    - name: filename
+      value: 9374c69a-3e84-4c32-a8a5-67dcc1cb7d3d.png
+      type: query
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
