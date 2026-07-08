@@ -43,5 +43,19 @@ docker exec -it curso-fastapi-localstack awslocal s3 ls s3://curso-udemy --recur
 # Alembic
 
 ```bash
-docker exec -it curso-fastapi-python alembic init alembic
+docker exec -it curso-fastapi-python alembic init alembi
+```
+
+# Migration
+
+## Create
+
+```bash
+docker exec -it curso-fastapi-python alembic revision --autogenerate -m "create state table"
+```
+
+## Execute
+
+```bash
+docker exec -it curso-fastapi-python alembic upgrade head
 ```
