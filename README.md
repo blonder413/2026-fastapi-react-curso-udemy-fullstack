@@ -39,3 +39,9 @@ docker exec -it curso-fastapi-localstack awslocal s3 mb s3://curso-udemy
 ```bash
 docker exec -it curso-fastapi-localstack awslocal s3 ls s3://curso-udemy --recursive
 ```
+
+# Alembic
+
+```bash
+docker exec -it curso-fastapi-python alembic init alembic
+```
