@@ -4,6 +4,8 @@ from database import get_session
 from sqlmodel import Session
 from models.models import Estado
 from sqlalchemy import desc
+from interfaces.interfaces import GenericInterface
+from .dto.state_dto import StateDto
 
 router = APIRouter(prefix="/state", tags=["State"])
 
@@ -32,5 +34,34 @@ async def show(id: int, session: Session = Depends(get_session)):
         content={
             "status": {"status_code": status.HTTP_200_OK},
             "response": data.model_dump(),
+        },
+    )
+
+
+@router.post("/", response_model=GenericInterface)
+async def create(dto: StateDto, session: Session = Depends(get_session)):
+    dto.nombre = dto.nombre.lower()
+    try:
+        data = Estado(**dto.model_dump())
+        session.add(data)
+        session.commit()
+        session.refresh(data)
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": f"Error: {e}",
+                },
+                "response": {},
+            },
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content={
+            "status": {"status_code": status.HTTP_201_CREATED, "message": "created"},
+            "response": dto.model_dump(),
         },
     )
