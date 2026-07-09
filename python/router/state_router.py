@@ -47,6 +47,7 @@ async def create(dto: StateDto, session: Session = Depends(get_session)):
         session.commit()
         session.refresh(data)
     except Exception as e:
+        session.rollback()
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={
