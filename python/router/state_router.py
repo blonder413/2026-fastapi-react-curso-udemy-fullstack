@@ -41,6 +41,20 @@ async def show(id: int, session: Session = Depends(get_session)):
 @router.post("/", response_model=GenericInterface)
 async def create(dto: StateDto, session: Session = Depends(get_session)):
     dto.nombre = dto.nombre.lower()
+
+    exists = session.query(Estado).filter(Estado.nombre == dto.nombre).first()
+    if exists:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": "El registro ya existe",
+                },
+                "response": {},
+            },
+        )
+
     try:
         data = Estado(**dto.model_dump())
         session.add(data)
