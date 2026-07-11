@@ -80,3 +80,43 @@ async def create(dto: StateDto, session: Session = Depends(get_session)):
             "response": dto.model_dump(),
         },
     )
+
+
+@router.put("/{id}", response_model=GenericInterface)
+async def update(id: int, dto: StateDto, session: Session = Depends(get_session)):
+    data = session.get(Estado, id)
+    if not data:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "status": {
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "message": "Not Found",
+                },
+                "response": {},
+            },
+        )
+
+    try:
+        data.nombre = dto.nombre
+        session.commit()
+        session.refresh(data)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "status": {"status_code": status.HTTP_200_OK, "message": "Updated"},
+                "response": data.model_dump(),
+            },
+        )
+    except Exception as e:
+        session.rollback()
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status": status.HTTP_400_BAD_REQUEST,
+                    "message": f"Error: {e}",
+                },
+                "response": {},
+            },
+        )
