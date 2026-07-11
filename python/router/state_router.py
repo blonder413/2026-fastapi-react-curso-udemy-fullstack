@@ -120,3 +120,42 @@ async def update(id: int, dto: StateDto, session: Session = Depends(get_session)
                 "response": {},
             },
         )
+
+
+@router.delete("/{id}", response_model=GenericInterface)
+async def destroy(id: int, session: Session = Depends(get_session)):
+    data = session.get(Estado, id)
+    if not data:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "status": {
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "message": "Not Found",
+                },
+                "response": {},
+            },
+        )
+
+    try:
+        session.delete(data)
+        session.commit()
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "status": {"status_code": status.HTTP_200_OK, "messae": "Deleted"},
+                "response": {},
+            },
+        )
+    except Exception as e:
+        session.rollback()
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": f"Error: {e}",
+                },
+                "response": {},
+            },
+        )
