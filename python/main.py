@@ -6,6 +6,7 @@ from fastapi.exceptions import RequestValidationError
 from router.ejemplo_router import router as ejemplo_router
 from router.upload_router import router as upload_router
 from router.state_router import router as state_router
+from router.category_router import router as category_router
 
 from dotenv import load_dotenv
 
@@ -31,6 +32,7 @@ def json_response():
 app.include_router(ejemplo_router)
 app.include_router(upload_router)
 app.include_router(state_router)
+app.include_router(category_router)
 
 
 @app.exception_handler(status.HTTP_404_NOT_FOUND)
