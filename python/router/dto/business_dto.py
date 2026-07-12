@@ -11,6 +11,7 @@ class BusinessDto(BaseModel):
     phone_number: str
     address: str
     location: str
+    description: str
 
     @model_validator(mode="after")
     def validate_name(self):
