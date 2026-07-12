@@ -5,6 +5,7 @@ from database import get_session
 from sqlalchemy import desc
 from sqlmodel import Session
 from slugify import slugify
+from typing import Annotated
 
 from .dto.category_dto import CategoryDto
 from interfaces.interfaces import GenericInterface
@@ -13,8 +14,8 @@ from models.models import Category
 router = APIRouter(prefix="/category", tags=["Category"])
 
 
-@router.get("/", response_model=list[Category])
-async def index(session: Session = Depends(get_session)):
+@router.get("/")
+async def index(session: Annotated[Session, Depends(get_session)]):
     data = session.query(Category).order_by(desc(Category.id)).all()
     return JSONResponse(
         status_code=status.HTTP_200_OK,
