@@ -93,3 +93,84 @@ async def create(dto: CategoryDto, session: Session = Depends(get_session)):
                 "response": {},
             },
         )
+
+
+@router.put("/{id}", response_model=GenericInterface)
+async def update(id: int, dto: CategoryDto, session: Session = Depends(get_session)):
+    data = session.get(Category, id)
+    if not data:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "status": {
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "message": "Not Found",
+                },
+                "response": {},
+            },
+        )
+
+    try:
+        data.nombre = dto.nombre
+        data.slug = slugify(dto.nombre)
+
+        session.commit()
+        session.refresh(data)
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "status": {"status_code": status.HTTP_200_OK, "message": "Updated"},
+                "response": data.model_dump(),
+            },
+        )
+    except Exception as e:
+        session.rollback()
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status": status.HTTP_400_BAD_REQUEST,
+                    "message": f"Error: {e}",
+                },
+                "response": {},
+            },
+        )
+
+
+@router.delete("/{id}", response_model=GenericInterface)
+async def destroy(id: int, session: Session = Depends(get_session)):
+    data = session.get(Category, id)
+    if not data:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "status": {
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "message": "Not Found",
+                },
+                "response": {},
+            },
+        )
+
+    try:
+        session.delete(data)
+        session.commit()
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "status": {"status_code": status.HTTP_200_OK, "messae": "Deleted"},
+                "response": {},
+            },
+        )
+    except Exception as e:
+        session.rollback()
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": f"Error: {e}",
+                },
+                "response": {},
+            },
+        )
