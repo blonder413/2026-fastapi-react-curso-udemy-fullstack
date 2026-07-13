@@ -6,11 +6,11 @@ from dotenv import load_dotenv
 import os
 from slugify import slugify
 from sqlalchemy import desc
-from sqlmodel import Session
+from sqlmodel import Session, select
 from typing import Annotated
 
 from interfaces.interfaces import GenericInterface
-from models.models import Business, Category
+from models.models import Business, Category, User
 from .dto.business_dto import BusinessDto
 
 load_dotenv()
@@ -42,6 +42,21 @@ async def create(dto: BusinessDto, session: Annotated[Session, Depends(get_sessi
                     "status": {
                         "status_code": status.HTTP_400_BAD_REQUEST,
                         "message": "Category Not Found",
+                    },
+                    "response": {},
+                },
+            )
+
+        user = session.exec(
+            select(User).where(User.id == dto.user_id, User.state_id == 1)
+        ).first()
+        if not user:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={
+                    "status": {
+                        "status_code": status.HTTP_400_BAD_REQUEST,
+                        "message": "User Not Found",
                     },
                     "response": {},
                 },
