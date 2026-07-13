@@ -10,7 +10,7 @@ from sqlmodel import Session
 from typing import Annotated
 
 from interfaces.interfaces import GenericInterface
-from models.models import Business
+from models.models import Business, Category
 from .dto.business_dto import BusinessDto
 
 load_dotenv()
@@ -29,6 +29,19 @@ async def create(dto: BusinessDto, session: Annotated[Session, Depends(get_sessi
                     "status": {
                         "status_code": status.HTTP_409_CONFLICT,
                         "message": "Record already exists",
+                    },
+                    "response": {},
+                },
+            )
+
+        category = session.get(Category, dto.category_id)
+        if not category:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={
+                    "status": {
+                        "status_code": status.HTTP_400_BAD_REQUEST,
+                        "message": "Category Not Found",
                     },
                     "response": {},
                 },
