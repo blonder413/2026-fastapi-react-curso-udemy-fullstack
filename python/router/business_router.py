@@ -10,7 +10,9 @@ from sqlmodel import Session, select
 from typing import Annotated
 
 from interfaces.interfaces import GenericInterface
+from interfaces.Business import BusinessInterface
 from models.models import Business, Category, User
+from utils.utils import date_format
 from .dto.business_dto import BusinessDto
 
 load_dotenv()
@@ -103,3 +105,36 @@ async def create(dto: BusinessDto, session: Annotated[Session, Depends(get_sessi
                 "response": {},
             },
         )
+
+
+@router.get("/")
+async def index(session: Annotated[Session, Depends(get_session)]):
+    data = session.query(Business).order_by(desc(Business.id)).all()
+    response = [
+        BusinessInterface(
+            id=business.id,
+            state_id=business.state_id if business.state else None,
+            state=business.state.nombre,
+            category_id=business.category_id if business.category else None,
+            category=business.category.nombre,
+            user_id=business.user_id,
+            user=business.user.name if business.user else None,
+            name=business.name,
+            slug=business.slug,
+            email=business.email,
+            phone_number=business.phone_number,
+            address=business.address,
+            logo=business.logo,
+            location=business.location,
+            description=business.description,
+            date=date_format(business.date),
+        ).model_dump(mode="json")
+        for business in data
+    ]
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "status": {"status_code": status.HTTP_200_OK, "message": "Records Found"},
+            "response": response,
+        },
+    )
