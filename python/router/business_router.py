@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 from slugify import slugify
 from sqlalchemy import desc
+from sqlalchemy.orm import joinedload
 from sqlmodel import Session, select
 from typing import Annotated
 
@@ -135,6 +136,43 @@ async def index(session: Annotated[Session, Depends(get_session)]):
         status_code=status.HTTP_200_OK,
         content={
             "status": {"status_code": status.HTTP_200_OK, "message": "Records Found"},
+            "response": response,
+        },
+    )
+
+
+@router.get("/{id}", response_model=GenericInterface)
+async def show(id: int, session: Annotated[Session, Depends(get_session)]):
+    data = (
+        session.query(Business)
+        .options(
+            joinedload(Business.state),
+            joinedload(Business.category),
+            joinedload(Business.user),
+        )
+        .filter(Business.id == id)
+        .first()
+    )
+    if not data:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "status": {
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "message": "Not Found",
+                },
+                "response": {},
+            },
+        )
+
+    response = BusinessInterface.model_validate(data).model_dump(
+        mode="json", exclude={"state_id", "category_id", "user_id"}
+    )
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "status": {"status_code": status.HTTP_200_OK, "message": "Record Found"},
             "response": response,
         },
     )
