@@ -125,7 +125,11 @@ async def index(session: Annotated[Session, Depends(get_session)]):
             email=business.email,
             phone_number=business.phone_number,
             address=business.address,
-            logo=business.logo,
+            logo=(
+                f"{os.getenv('AWS_BUCKET_URL')}/{os.getenv('S3_BUCKET_NAME')}/files/{business.logo}"
+                if os.getenv("ENVIRONMENT") == "local"
+                else f"https://{os.getenv('S3_BUCKET_NAME')}.s3.{os.getenv('AWS_REGION')}.amazonaws.com/files/{business.logo}"
+            ),
             location=business.location,
             description=business.description,
             date=date_format(business.date),
@@ -164,6 +168,11 @@ async def show(id: int, session: Annotated[Session, Depends(get_session)]):
                 "response": {},
             },
         )
+
+    if os.getenv("ENVIRONMENT") == "local":
+        data.logo = f"{os.getenv('AWS_BUCKET_URL')}/{os.getenv('S3_BUCKET_NAME')}/files/{data.logo}"
+    else:
+        data.logo = f"https://{os.getenv('S3_BUCKET_NAME')}.s3.{os.getenv('AWS_REGION')}.amazonaws.com/files/{data.logo}"
 
     response = BusinessInterface.model_validate(data).model_dump(
         mode="json", exclude={"state_id", "category_id", "user_id"}
