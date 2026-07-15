@@ -176,3 +176,87 @@ async def show(id: int, session: Annotated[Session, Depends(get_session)]):
             "response": response,
         },
     )
+
+
+@router.put("/{id}", response_model=GenericInterface)
+async def update(
+    id: int, dto: BusinessDto, session: Annotated[Session, Depends(get_session)]
+):
+    data = session.get(Business, id)
+    if not data:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": "Business Not Found",
+                },
+                "response": {},
+            },
+        )
+
+    category = session.get(Category, dto.category_id)
+    if not category:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": "Category Not Found",
+                },
+                "response": {},
+            },
+        )
+
+    user = session.exec(
+        select(User).where(User.id == dto.user_id, User.state_id == 1)
+    ).first()
+    if not user:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": "User Not Found",
+                },
+                "response": {},
+            },
+        )
+
+    try:
+        data.state_id = dto.state_id
+        data.category_id = dto.category_id
+        data.user_id = dto.user_id
+        data.name = dto.name
+        data.slug = slugify(dto.name)
+        data.email = dto.email
+        data.phone_number = dto.phone_number
+        data.address = dto.address
+        data.location = dto.location
+        data.description = dto.description
+
+        session.commit()
+        session.refresh(data)
+
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "status": {
+                    "status_code": status.HTTP_200_OK,
+                    "message": "Updated",
+                },
+                "response": data.model_dump(mode="json"),
+            },
+        )
+    except Exception as e:
+        session.rollback()
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": str(e),
+                },
+                "response": {},
+            },
+        )
