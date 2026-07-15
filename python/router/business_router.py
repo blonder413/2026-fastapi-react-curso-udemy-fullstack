@@ -12,7 +12,7 @@ from typing import Annotated
 
 from interfaces.interfaces import GenericInterface
 from interfaces.Business import BusinessInterface
-from models.models import Business, Category, User
+from models.models import Business, Category, Estado, User
 from utils.utils import date_format
 from .dto.business_dto import BusinessDto
 
@@ -190,6 +190,18 @@ async def update(
                 "status": {
                     "status_code": status.HTTP_400_BAD_REQUEST,
                     "message": "Business Not Found",
+                },
+                "response": {},
+            },
+        )
+    state = session.get(Estado, dto.state_id)
+    if not state:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": "State Not Found",
                 },
                 "response": {},
             },
