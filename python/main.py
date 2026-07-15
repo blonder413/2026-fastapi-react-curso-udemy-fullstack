@@ -8,6 +8,7 @@ from router.upload_router import router as upload_router
 from router.state_router import router as state_router
 from router.category_router import router as category_router
 from router.business_router import router as business_router
+from router.business_logo_router import router as business_logo_router
 
 from dotenv import load_dotenv
 
@@ -35,6 +36,7 @@ app.include_router(upload_router)
 app.include_router(state_router)
 app.include_router(category_router)
 app.include_router(business_router)
+app.include_router(business_logo_router)
 
 
 @app.exception_handler(status.HTTP_404_NOT_FOUND)
