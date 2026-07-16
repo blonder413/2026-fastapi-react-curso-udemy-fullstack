@@ -54,3 +54,9 @@ class Business(SQLModel, table=True):
     location: str
     description: str
     date: datetime = Field(default_factory=datetime.now)
+
+
+class PlatesCategory(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    name: str
+    slug: str
