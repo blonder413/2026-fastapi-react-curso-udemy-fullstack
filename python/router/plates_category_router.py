@@ -1,8 +1,40 @@
 from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
-from dotenv import load_dotenv
+from database import get_session
+from sqlmodel import Session
 
-load_dotenv()
+from interfaces.interfaces import GenericInterface
+from models.models import PlatesCategory
+from typing import Annotated
 
 router = APIRouter(prefix="/plates-category", tags=["Plates category"])
+
+
+@router.get("/", response_model=GenericInterface)
+async def index(session: Annotated[Session, Depends(get_session)]):
+    try:
+        data = session.query(PlatesCategory).order_by(PlatesCategory.id.desc()).all()
+        
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "status": {
+                    "status_code": status.HTTP_200_OK,
+                    "message": "Records Found",
+                },
+                "response": jsonable_encoder(data)
+            },
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "status": {
+                    "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": str(e),
+                },
+                "response": {},
+            },
+        )
