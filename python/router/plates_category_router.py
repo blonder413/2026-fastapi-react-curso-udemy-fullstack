@@ -3,11 +3,14 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from database import get_session
+from slugify import slugify
 from sqlmodel import Session
 
 from interfaces.interfaces import GenericInterface
 from models.models import PlatesCategory
 from typing import Annotated
+
+from .dto.plates_category_dto import PlatesCategoryDto
 
 router = APIRouter(prefix="/plates-category", tags=["Plates category"])
 
@@ -61,3 +64,49 @@ async def show(id: int, session: Annotated[Session, Depends(get_session)]):
             "response": data.model_dump(mode="json"),
         },
     )
+
+
+@router.post("/", response_model=GenericInterface)
+async def create(
+    dto: PlatesCategoryDto, session: Annotated[Session, Depends(get_session)]
+):
+    exists = session.query(PlatesCategory).filter_by(name=dto.name).first()
+    if exists:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": "Not Found",
+                },
+                "response": {},
+            },
+        )
+
+    try:
+        data = PlatesCategory(name=dto.name, slug=slugify(dto.name))
+        session.add(data)
+        session.commit()
+
+        return JSONResponse(
+            status_code=status.HTTP_201_CREATED,
+            content={
+                "status": {
+                    "status_code": status.HTTP_201_CREATED,
+                    "message": "Created",
+                },
+                "response": data.model_dump(mode="json"),
+            },
+        )
+    except Exception as e:
+        session.rollback()
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": str(e),
+                },
+                "response": {},
+            },
+        )
