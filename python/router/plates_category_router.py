@@ -110,3 +110,86 @@ async def create(
                 "response": {},
             },
         )
+
+
+@router.put("/{id}", response_model=GenericInterface)
+async def update(
+    id: int, dto: PlatesCategory, session: Annotated[Session, Depends(get_session)]
+):
+    data = session.get(PlatesCategory, id)
+    if not data:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "status": {
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "message": "Not Found",
+                },
+                "response": {},
+            },
+        )
+
+    try:
+        data.name = dto.name
+        data.slug = slugify(dto.name)
+        session.commit()
+        session.refresh(data)
+    except Exception as e:
+        session.rollback()
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": str(e),
+                },
+                "response": {},
+            },
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "status": {"status_code": status.HTTP_200_OK, "message": "Updated"},
+            "response": data.model_dump(mode="json"),
+        },
+    )
+
+
+@router.delete("/{id}", response_model=GenericInterface)
+async def destroy(id: int, session: Annotated[Session, Depends(get_session)]):
+    data = session.get(PlatesCategory, id)
+    if not data:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "status": {
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "message": "Not Found",
+                },
+                "response": {},
+            },
+        )
+    try:
+        session.delete(data)
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": str(e),
+                },
+                "response": {},
+            },
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "status": {"status_code": status.HTTP_200_OK, "message": "Deleted"},
+            "response": data.model_dump(mode="json"),
+        },
+    )

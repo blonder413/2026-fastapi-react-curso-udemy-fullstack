@@ -1,0 +1,21 @@
+info:
+  name: update
+  type: http
+  seq: 4
+
+http:
+  method: PUT
+  url: http://localhost:8050/plates-category/3
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Plate 3 Updated"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
