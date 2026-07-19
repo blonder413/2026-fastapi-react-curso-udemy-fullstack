@@ -43,6 +43,7 @@ class Business(SQLModel, table=True):
     state: Optional[Estado] = Relationship(back_populates="business")
     category_id: int | None = Field(default=None, foreign_key="category.id")
     category: Optional[Category] = Relationship(back_populates="business")
+    plates: list["Plate"] = Relationship(back_populates="business")
     user_id: int | None = Field(default=None, foreign_key="user.id")
     user: Optional[User] = Relationship(back_populates="business")
     name: str = Field(max_length=100)
@@ -58,5 +59,20 @@ class Business(SQLModel, table=True):
 
 class PlatesCategory(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
+    plates: list["Plate"] = Relationship(back_populates="plates")
     name: str
     slug: str
+
+
+class Plate(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    business_id: int | None = Field(default=None, foreign_key="business.id")
+    business: Optional[Business] = Relationship(back_populates="plates")
+    plates_category_id: int | None = Field(
+        default=None, foreign_key="platescategory.id"
+    )
+    plates_category: Optional[PlatesCategory] = Relationship(back_populates="plates")
+    name: str
+    ingredients: str
+    price: int
+    photo: str
