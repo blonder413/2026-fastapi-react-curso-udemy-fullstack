@@ -59,7 +59,7 @@ class Business(SQLModel, table=True):
 
 class PlatesCategory(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    plates: list["Plate"] = Relationship(back_populates="plates")
+    plates: list["Plate"] = Relationship(back_populates="plates_category")
     name: str
     slug: str
 
