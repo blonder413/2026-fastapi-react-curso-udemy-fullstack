@@ -1,13 +1,22 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Form, status, UploadFile
+from fastapi.responses import JSONResponse
 
 import boto3
+from database import get_session
 from dotenv import load_dotenv
 import os
+from sqlmodel import Session
+from typing import Annotated
+import uuid
+
+from models.models import Plate
 
 load_dotenv()
 
 router = APIRouter(prefix="/plate", tags=["Plate"])
 
+S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
+AWS_BUCKET_URL = os.getenv("AWS_BUCKET_URL")
 
 s3_client = boto3.client(
     "s3",
@@ -20,3 +29,83 @@ s3_client = boto3.client(
         else None
     ),
 )
+
+
+@router.post("/")
+async def create(
+    business_id: Annotated[int, Form()],
+    plates_category_id: Annotated[int, Form()],
+    name: Annotated[str, Form()],
+    ingredients: Annotated[str, Form()],
+    price: Annotated[int, Form()],
+    file: UploadFile,
+    session: Annotated[Session, Depends(get_session)],
+):
+    if file.content_type == "image/jpeg":
+        extension = "jpg"
+    elif file.content_type == "image/png":
+        extension = "png"
+    else:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": "Invalid file",
+                },
+                "response": {},
+            },
+        )
+
+    file_name = f"{uuid.uuid4()}.{extension}"
+
+    try:
+        s3_client.upload_fileobj(
+            file.file,
+            S3_BUCKET_NAME,
+            f"files/{file_name}",
+            ExtraArgs={"ContentType": file.content_type},
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "status": {
+                    "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": str(e),
+                },
+                "response": {},
+            },
+        )
+
+    data = Plate(
+        plates_category_id=plates_category_id,
+        business_id=business_id,
+        name=name,
+        price=price,
+        ingredients=ingredients,
+        photo=file_name,
+    )
+    try:
+        session.add(data)
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": str(e),
+                },
+                "response": {},
+            },
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content={
+            "status": {"status_code": status.HTTP_201_CREATED, "message": "Created"},
+            "response": data.model_dump(mode="json"),
+        },
+    )
