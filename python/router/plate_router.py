@@ -9,7 +9,7 @@ from sqlmodel import Session
 from typing import Annotated
 import uuid
 
-from models.models import Plate
+from models.models import Business, Plate, PlatesCategory
 
 load_dotenv()
 
@@ -41,6 +41,32 @@ async def create(
     file: UploadFile,
     session: Annotated[Session, Depends(get_session)],
 ):
+    business = session.get(Business, business_id)
+    if not business:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "status": {
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "message": "Business Not Found",
+                },
+                "response": {},
+            },
+        )
+
+    plate_category = session.get(PlatesCategory, plates_category_id)
+    if not plate_category:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "status": {
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "message": "PlateCategory  Not Found",
+                },
+                "response": {},
+            },
+        )
+
     if file.content_type == "image/jpeg":
         extension = "jpg"
     elif file.content_type == "image/png":
