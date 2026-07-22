@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Form, Query, status, UploadFile
+from fastapi import APIRouter, Depends, Form, HTTPException, Query, status, UploadFile
 from fastapi.responses import JSONResponse
 
 import boto3
@@ -199,3 +199,51 @@ def index(
         "status": {"status_code": status.HTTP_200_OK, "message": "Records Found"},
         "response": response,
     }
+
+
+@router.delete("/{id}", response_model=ResponseInterface)
+def destroy(id: int, session: Annotated[Session, Depends(get_session)]):
+    data = session.get(Plate, id)
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
+
+    try:
+        s3_client.head_object(Bucket=S3_BUCKET_NAME, Key=f"files/{data.photo}")
+    except s3_client.exceptions.ClientError as e:
+        if e.response["Error"]["Code"] == "404":
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="File not found"
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Error validating file"
+            )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected Error"
+        )
+
+    try:
+        s3_client.delete_object(Bucket=S3_BUCKET_NAME, Key=f"files/{data.photo}")
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error on delete file: {str(e)}",
+        )
+
+    try:
+        session.delete(data)
+        session.commit()
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error on delete record",
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "status": {"status_code": status.HTTP_200_OK, "message": "Deleted"},
+            "response": data.model_dump(mode="json"),
+        },
+    )
