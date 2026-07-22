@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends, Form, status, UploadFile
+from fastapi import APIRouter, Depends, Form, Query, status, UploadFile
 from fastapi.responses import JSONResponse
 
 import boto3
 from database import get_session
 from dotenv import load_dotenv
+from interfaces.interfaces import GenericInterface
+from interfaces.Plate import PlateResponse
+from interfaces.Response import ResponseInterface
 import os
 from sqlmodel import select, Session
 from typing import Annotated
@@ -150,3 +153,49 @@ async def create(
             "response": data.model_dump(mode="json"),
         },
     )
+
+
+@router.get("/", response_model=ResponseInterface[list[PlateResponse]])
+def index(
+    business_id: Annotated[int, Query()],
+    session: Annotated[Session, Depends(get_session)],
+):
+    business = session.get(Business, business_id)
+    if not business:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "status": {
+                    "status_code": status.HTTP_404_NOT_FOUND,
+                    "message": "Business Not Found",
+                },
+                "response": {},
+            },
+        )
+
+    data = session.exec(
+        select(Plate).order_by(Plate.id.desc()).where(Plate.business_id == business_id)
+    ).all()
+
+    response = [
+        PlateResponse(
+            id=plate.id,
+            name=plate.name,
+            ingredients=plate.ingredients,
+            price=plate.price,
+            photo=(
+                f"{AWS_BUCKET_URL}/{S3_BUCKET_NAME}/files/{plate.photo}"
+                if os.getenv("ENVIRONMENT") == "local"
+                else f"https://{S3_BUCKET_NAME}.s3.{os.getenv('AWS_REGION')}.amazonaws.com/files/{plate.photo}"
+            ),
+            plate_category=(
+                plate.plates_category.name if plate.plates_category else ""
+            ),
+        ).model_dump(mode="json")
+        for plate in data
+    ]
+
+    return {
+        "status": {"status_code": status.HTTP_200_OK, "message": "Records Found"},
+        "response": response,
+    }
