@@ -5,7 +5,7 @@ import boto3
 from database import get_session
 from dotenv import load_dotenv
 import os
-from sqlmodel import Session
+from sqlmodel import select, Session
 from typing import Annotated
 import uuid
 
@@ -62,6 +62,21 @@ async def create(
                 "status": {
                     "status_code": status.HTTP_404_NOT_FOUND,
                     "message": "PlateCategory  Not Found",
+                },
+                "response": {},
+            },
+        )
+
+    exists = session.exec(
+        select(Plate).where(Plate.name == name, Plate.business_id == business_id)
+    ).first()
+    if exists:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "status": {
+                    "status_code": status.HTTP_400_BAD_REQUEST,
+                    "message": "Information exists",
                 },
                 "response": {},
             },
