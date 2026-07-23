@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from .interfaces.Plate import PlateResponse
+from .Plate import PlateResponse
 
 
 class BusinessSlugResponse(BaseModel):
@@ -22,5 +22,4 @@ class BusinessSlugResponse(BaseModel):
     date: str
     plates: list[PlateResponse]
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
