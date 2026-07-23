@@ -13,6 +13,7 @@ from router.business_user_router import router as business_user_router
 from router.plates_category_router import router as plates_category_router
 from router.plate_router import router as plate_router
 from router.menu_route import router as menu_route
+from router.profile_router import router as profile_router
 
 from dotenv import load_dotenv
 
@@ -45,6 +46,7 @@ app.include_router(business_user_router)
 app.include_router(plates_category_router)
 app.include_router(plate_router)
 app.include_router(menu_route)
+app.include_router(profile_router)
 
 
 @app.exception_handler(status.HTTP_404_NOT_FOUND)
