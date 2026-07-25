@@ -65,3 +65,29 @@ async def create(dto: ProfileDto, session: Annotated[Session, Depends(get_sessio
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error: {str(e)}"
         )
+
+
+@router.put("/{id}", response_model=ResponseInterface[Profile])
+async def update(
+    id: int, dto: ProfileDto, session: Annotated[Session, Depends(get_session)]
+):
+    data = session.get(Profile, id)
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
+
+    try:
+        data.name = dto.name
+        session.commit()
+        session.refresh(data)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error: {str(e)}"
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "status": {"status_code": status.HTTP_200_OK, "message": "Uṕdated"},
+            "response": data.model_dump(),
+        },
+    )
