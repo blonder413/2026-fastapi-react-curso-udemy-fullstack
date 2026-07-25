@@ -7,6 +7,7 @@ from typing import Annotated
 
 from interfaces.Response import ResponseInterface
 from models.models import Profile
+from .dto.profile_dto import ProfileDto
 
 router = APIRouter(prefix="/profile", tags=["Profile"])
 
@@ -35,3 +36,32 @@ async def show(id: int, session: Annotated[Session, Depends(get_session)]):
             "response": data.model_dump(),
         },
     )
+
+
+@router.post("", response_model=ResponseInterface[Profile])
+async def create(dto: ProfileDto, session: Annotated[Session, Depends(get_session)]):
+    exists = session.query(Profile).filter(Profile.name == dto.name).first()
+    if exists:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Record exists"
+        )
+
+    try:
+        data = Profile(**dto.model_dump())
+        session.add(data)
+        session.commit()
+        session.refresh(data)
+        return JSONResponse(
+            status_code=status.HTTP_201_CREATED,
+            content={
+                "status": {
+                    "status_code": status.HTTP_201_CREATED,
+                    "message": "Created",
+                },
+                "response": data.model_dump(),
+            },
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error: {str(e)}"
+        )
