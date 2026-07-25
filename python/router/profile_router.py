@@ -87,7 +87,31 @@ async def update(
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={
-            "status": {"status_code": status.HTTP_200_OK, "message": "Uṕdated"},
+            "status": {"status_code": status.HTTP_200_OK, "message": "Updated"},
             "response": data.model_dump(),
+        },
+    )
+
+
+@router.delete("/{id}", response_model=ResponseInterface[Profile])
+async def destroy(id: int, session: Annotated[Session, Depends(get_session)]):
+    data = session.get(Profile, id)
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
+
+    try:
+        session.delete(data)
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error: {str(e)}"
+        )
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "status": {"status_code": status.HTTP_200_OK, "message": "Deleted"},
+            "response": {},
         },
     )
