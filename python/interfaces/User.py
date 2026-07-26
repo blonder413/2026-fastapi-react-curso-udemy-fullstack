@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 class UserResponse(BaseModel):
     id:int
-    state_int:int
+    state_id:int
     state:str
     profile_id:int
     profile:str
