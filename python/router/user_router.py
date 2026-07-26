@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 
 from database import get_session
 from sqlalchemy import desc
-from sqlmodel import Session
+from sqlmodel import Session, select
 from typing import Annotated
 
+from .dto.user_dto import UserDto
 from interfaces.Response import ResponseInterface
 from interfaces.User import UserResponse
-from models.models import User
+from models.models import Profile, User
 
 router = APIRouter(prefix="/user", tags=["User"])
 
@@ -35,4 +36,65 @@ async def index(session: Annotated[Session, Depends(get_session)]):
             "status":{"status_code":status.HTTP_200_OK, "message":"Record Found"},
             "response":response
         }
+    )
+
+@router.get("/{id}", response_model=ResponseInterface[UserResponse])
+async def show(id:int, session: Annotated[Session, Depends(get_session)]):
+    data=session.get(User,id)
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
+
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "status": {"status_code": status.HTTP_200_OK, "message": "Record Found"},
+            "response": {
+                **data.model_dump(mode="json", exclude=["password"]),
+                "profile":data.profile.name if data.profile else ""
+            },
+        },
+    )
+
+
+@router.post("/", response_model=ResponseInterface[UserResponse])
+async def create(dto:UserDto, session: Annotated[Session, Depends(get_session)]):
+    profile=session.get(Profile, dto.profile_id)
+    if not profile:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile Not Found")
+    
+    exists=session.exec(
+        select(User).where(User.email==dto.email)
+    ).first()
+    if exists:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="El correo ya existe"
+        )
+
+    data=User(**dto.model_dump())
+    data.state_id=1
+    data.token="abc123456"
+    session.add(data)
+
+    try:
+        session.commit()
+        session.refresh(data)
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Error: {e}"
+        )
+    
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "status": {"status_code": status.HTTP_200_OK, "message": "Created"},
+            "response": {
+                **data.model_dump(mode="json", exclude=["password"]),
+                "profile":data.profile.name if data.profile else "",
+                "state":data.state.nombre if data.state else ""
+            },
+        },
     )
