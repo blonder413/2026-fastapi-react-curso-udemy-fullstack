@@ -10,6 +10,7 @@ from .dto.user_dto import UserDto
 from interfaces.Response import ResponseInterface
 from interfaces.User import UserResponse
 from models.models import Profile, User
+from utils.utils import generate_hash
 
 router = APIRouter(prefix="/user", tags=["User"])
 
@@ -73,6 +74,7 @@ async def create(dto:UserDto, session: Annotated[Session, Depends(get_session)])
         )
 
     data=User(**dto.model_dump())
+    data.password=generate_hash(dto.password)
     data.state_id=1
     data.token="abc123456"
     session.add(data)
