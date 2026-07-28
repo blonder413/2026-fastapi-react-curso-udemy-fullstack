@@ -9,7 +9,7 @@ from typing import Annotated
 from .dto.user_dto import UserDto
 from interfaces.Response import ResponseInterface
 from interfaces.User import UserResponse
-from models.models import Profile, User
+from models.models import Estado, Profile, User
 from utils.utils import generate_hash
 
 router = APIRouter(prefix="/user", tags=["User"])
@@ -93,6 +93,52 @@ async def create(dto:UserDto, session: Annotated[Session, Depends(get_session)])
         status_code=status.HTTP_200_OK,
         content={
             "status": {"status_code": status.HTTP_200_OK, "message": "Created"},
+            "response": {
+                **data.model_dump(mode="json", exclude=["password"]),
+                "profile":data.profile.name if data.profile else "",
+                "state":data.state.nombre if data.state else ""
+            },
+        },
+    )
+
+
+@router.put("/{id}", response_model=ResponseInterface[UserResponse])
+async def update(id:int,dto:UserDto, session: Annotated[Session, Depends(get_session)]):
+    profile=session.get(Profile, dto.profile_id)
+    if not profile:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Profile Not Found")
+    
+
+    state=session.get(Estado, dto.estado_id)
+    if not state:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="State Not Found")
+    
+    data=session.get(User,id)
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Not Found")
+    
+    data.state_id=dto.estado_id
+    data.profile_id=dto.profile_id
+    data.name=dto.name
+    data.email=dto.email
+
+    if dto.update_password==1:
+        data.password=generate_hash(dto.password)
+
+    try:
+        session.commit()
+        session.refresh(data)
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(
+            status_code=status.http_400_BAD_REQUEST,
+            detail=f"Error: {e}"
+        )
+    
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "status": {"status_code": status.HTTP_200_OK, "message": "Updated"},
             "response": {
                 **data.model_dump(mode="json", exclude=["password"]),
                 "profile":data.profile.name if data.profile else "",

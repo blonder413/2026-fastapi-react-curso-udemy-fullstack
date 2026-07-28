@@ -1,0 +1,27 @@
+info:
+  name: update
+  type: http
+  seq: 4
+
+http:
+  method: PUT
+  url: http://localhost:8050/user/2
+  body:
+    type: json
+    data: |-
+      {
+        "name": "Chris Redfield",
+        "profile_id": 1,
+        "estado_id": 1,
+        "email": "credfield@starts.gov",
+        "password": "password",
+        "token": "abc123",
+        "update_password": 0
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
