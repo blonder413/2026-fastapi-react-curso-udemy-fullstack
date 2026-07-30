@@ -15,6 +15,7 @@ from router.plate_router import router as plate_router
 from router.menu_route import router as menu_route
 from router.profile_router import router as profile_router
 from router.user_router import router as user_router
+from router.recovery_router import router as recovery_router
 
 from dotenv import load_dotenv
 
@@ -49,6 +50,7 @@ app.include_router(plate_router)
 app.include_router(menu_route)
 app.include_router(profile_router)
 app.include_router(user_router)
+app.include_router(recovery_router)
 
 
 @app.exception_handler(status.HTTP_404_NOT_FOUND)
