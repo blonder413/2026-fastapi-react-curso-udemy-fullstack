@@ -146,3 +146,27 @@ async def update(id:int,dto:UserDto, session: Annotated[Session, Depends(get_ses
             },
         },
     )
+
+
+@router.delete("/{id}", response_model=ResponseInterface[UserResponse])
+async def destroy(id:int, session: Annotated[Session, Depends(get_session)]):
+    data=session.get(User,id)
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Not Found")
+    try:
+        session.delete(data)
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(
+            status_code=status.http_400_BAD_REQUEST,
+            detail=f"Error: {e}"
+        )
+    
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={
+            "status": {"status_code": status.HTTP_200_OK, "message": "Deleted"},
+            "response": {},
+        },
+    )
