@@ -9,7 +9,7 @@ from typing import Annotated
 from .dto.user_dto import UserDto
 from interfaces.Response import ResponseInterface
 from interfaces.User import UserResponse
-from models.models import Estado, Profile, User
+from models.models import Business, Estado, Profile, User
 from utils.utils import generate_hash
 
 router = APIRouter(prefix="/user", tags=["User"])
@@ -153,6 +153,16 @@ async def destroy(id:int, session: Annotated[Session, Depends(get_session)]):
     data=session.get(User,id)
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="Not Found")
+    
+    business=session.exec(
+        select(Business).where(Business.user_id==id)
+    ).first()
+    if business:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error: user is related to business. Cannot delete it."
+        )
+
     try:
         session.delete(data)
         session.commit()
