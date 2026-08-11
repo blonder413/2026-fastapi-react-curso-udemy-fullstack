@@ -71,3 +71,23 @@ docker exec -it curso-fastapi-python alembic revision --autogenerate -m "create 
 ```bash
 docker exec -it curso-fastapi-python alembic upgrade head
 ```
+
+# PyRight Configuration
+
+Seleccionar el intérprete en VSCodium
+
+```
+Ctrl+Shift+P → Python: Select Interpreter
+```
+
+y seleccionar:
+
+```
+proyecto/.venv/bin/python
+```
+
+o en Windows
+
+```
+proyecto\.venv\Scripts\python.exe
+```
