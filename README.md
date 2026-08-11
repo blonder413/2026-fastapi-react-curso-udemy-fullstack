@@ -40,6 +40,18 @@ docker exec -it curso-fastapi-localstack awslocal s3 mb s3://curso-udemy
 docker exec -it curso-fastapi-localstack awslocal s3 ls s3://curso-udemy --recursive
 ```
 
+# Create SQS on localstack
+
+```bash
+docker exec -it curso-fastapi-localstack awslocal sqs create-queue --queue-name send-email
+```
+
+# Lists SQS on localstack
+
+```bash
+docker exec -it curso-fastapi-localstack awslocal sqs list-queues
+```
+
 # Alembic
 
 ```bash

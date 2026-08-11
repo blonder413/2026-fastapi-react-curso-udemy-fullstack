@@ -1,29 +1,31 @@
-from fastapi import FastAPI, status, Request
-from fastapi.responses import JSONResponse
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from fastapi.exceptions import RequestValidationError
-
-from router.ejemplo_router import router as ejemplo_router
-from router.upload_router import router as upload_router
-from router.state_router import router as state_router
-from router.category_router import router as category_router
-from router.business_router import router as business_router
-from router.business_logo_router import router as business_logo_router
-from router.business_user_router import router as business_user_router
-from router.plates_category_router import router as plates_category_router
-from router.plate_router import router as plate_router
-from router.menu_route import router as menu_route
-from router.profile_router import router as profile_router
-from router.user_router import router as user_router
-from router.recovery_router import router as recovery_router
+import os
 
 from dotenv import load_dotenv
+from fastapi import FastAPI, Request, status
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from router.business_logo_router import router as business_logo_router
+from router.business_router import router as business_router
+from router.business_user_router import router as business_user_router
+from router.category_router import router as category_router
+from router.ejemplo_router import router as ejemplo_router
+from router.menu_route import router as menu_route
+from router.plate_router import router as plate_router
+from router.plates_category_router import router as plates_category_router
+from router.profile_router import router as profile_router
+from router.recovery_router import router as recovery_router
+from router.state_router import router as state_router
+from router.upload_router import router as upload_router
+from router.user_router import router as user_router
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from worker.sqs_worker import start_sqs_background_task
 
 load_dotenv()
-import os
+
 
 app = FastAPI()
 
+start_sqs_background_task(app)
 
 @app.get("/")
 def index():
