@@ -5,12 +5,12 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8050/recovery
+  url: http://localhost:8050/recovery/update/3e65e7c2-5742-46af-8e20-ab3def832e16178698101136c2bf8a-c5b7-4022-8efc-46ed95ee9bf1
   body:
     type: json
     data: |-
       {
-        "email": "jvalentine@bsaa.org"
+        "password": "123456"
       }
   auth: inherit
 
