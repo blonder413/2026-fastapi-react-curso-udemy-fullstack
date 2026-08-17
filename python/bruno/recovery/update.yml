@@ -1,0 +1,21 @@
+info:
+  name: update
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://localhost:8050/recovery
+  body:
+    type: json
+    data: |-
+      {
+        "email": "jvalentine@bsaa.org"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
