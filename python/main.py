@@ -17,6 +17,7 @@ from router.recovery_router import router as recovery_router
 from router.state_router import router as state_router
 from router.upload_router import router as upload_router
 from router.user_router import router as user_router
+from router.login_router import router as login_router
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from worker.sqs_worker import start_sqs_background_task
 
@@ -26,6 +27,7 @@ load_dotenv()
 app = FastAPI()
 
 start_sqs_background_task(app)
+
 
 @app.get("/")
 def index():
@@ -53,6 +55,7 @@ app.include_router(menu_route)
 app.include_router(profile_router)
 app.include_router(user_router)
 app.include_router(recovery_router)
+app.include_router(login_router)
 
 
 @app.exception_handler(status.HTTP_404_NOT_FOUND)
