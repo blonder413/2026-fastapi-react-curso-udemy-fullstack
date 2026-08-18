@@ -3,5 +3,7 @@ from fastapi.responses import JSONResponse
 from typing import Annotated
 
 from .dto.login_dto import LoginDto
+from interfaces.interfaces import GenericInterface
+from interfaces.LoginResponse import LoginResponse
 
-router=APIRouter(prefix="/auth/login", tags=["Login"])
+router = APIRouter(prefix="/auth/login", tags=["Login"])
