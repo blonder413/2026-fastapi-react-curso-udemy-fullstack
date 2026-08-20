@@ -1,17 +1,21 @@
-from fastapi import APIRouter, status, Depends, HTTPException
-from fastapi.responses import JSONResponse
+import os
 from typing import Annotated
 
 from database import get_session
-from sqlmodel import Session, select
-
-from .dto.login_dto import LoginDto
+from dotenv import load_dotenv
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from interfaces.interfaces import GenericInterface
 from interfaces.LoginResponse import LoginResponse
 from models.models import User
-from utils.utils import verify_password
+from sqlmodel import Session, select
+from utils.utils import create_access_token, verify_password
+
+from .dto.login_dto import LoginDto
 
 router = APIRouter(prefix="/auth/login", tags=["Login"])
+
+load_dotenv()
 
 
 @router.post("/", response_model=LoginResponse)
@@ -27,6 +31,10 @@ async def login(dto: LoginDto, session: Annotated[Session, Depends(get_session)]
             status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect password"
         )
 
+    token = create_access_token(
+        data={"sub": str(data.id), "name": data.name, "issuer": os.getenv("ISSUER")}
+    )
+
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={
@@ -36,7 +44,7 @@ async def login(dto: LoginDto, session: Annotated[Session, Depends(get_session)]
                 "id": data.id,
                 "name": data.name,
                 "profile": data.profile_id,
-                "token": "123456",
+                "token": token,
             },
         },
     )

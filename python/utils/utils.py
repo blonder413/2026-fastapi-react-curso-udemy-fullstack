@@ -1,14 +1,38 @@
-import bcrypt
-from datetime import datetime
-
-
 import os
-from dotenv import load_dotenv
 import smtplib
+from datetime import datetime, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from typing import Optional
+
+import bcrypt
+from dotenv import load_dotenv
+from fastapi import HTTPException, status
+from jose import JWTError, jwt
 
 load_dotenv()
+
+algorithm = os.getenv("ALGORITHM")
+secret_key = os.getenv("SECRET_KEY")
+
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    expire_minutes = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=expire_minutes))
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, secret_key, algorithm=algorithm)
+
+
+def decode_access_token(token: str):
+    try:
+        return jwt.decode(token, secret_key, algorithms=algorithm)
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 def date_format(date: datetime) -> str:
