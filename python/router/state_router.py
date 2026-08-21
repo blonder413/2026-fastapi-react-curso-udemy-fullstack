@@ -1,18 +1,28 @@
-from fastapi import APIRouter, status, Depends, HTTPException
-from fastapi.responses import JSONResponse
+from typing import Annotated
+
 from database import get_session
-from sqlmodel import Session
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
+from interfaces.interfaces import GenericInterface
 from models.models import Estado
 from sqlalchemy import desc
-from interfaces.interfaces import GenericInterface
+from sqlmodel import Session
+from utils.security import get_current_user
+
+from interfaces.User import UserResponse
+
 from .dto.state_dto import StateDto
 
 router = APIRouter(prefix="/state", tags=["State"])
 
 
 @router.get("/", response_model=list[Estado])
-async def index(session: Session = Depends(get_session)):
+async def index(
+    session: Annotated[Session, Depends(get_session)],
+    current_user: Annotated[UserResponse, Depends(get_current_user)],
+):
     data = session.query(Estado).order_by(desc(Estado.id)).all()
+    print(current_user)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={
@@ -23,7 +33,7 @@ async def index(session: Session = Depends(get_session)):
 
 
 @router.get("/{id}")
-async def show(id: int, session: Session = Depends(get_session)):
+async def show(id: int, session: Annotated[Session,Depends(get_session)],_: Annotated[UserResponse, Depends(get_current_user)]):
     data = session.get(Estado, id)
 
     if not data:
