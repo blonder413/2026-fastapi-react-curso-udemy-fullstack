@@ -3,12 +3,15 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import JSONResponse
 from router.business_logo_router import router as business_logo_router
 from router.business_router import router as business_router
 from router.business_user_router import router as business_user_router
 from router.category_router import router as category_router
 from router.ejemplo_router import router as ejemplo_router
+from router.login_router import router as login_router
 from router.menu_route import router as menu_route
 from router.plate_router import router as plate_router
 from router.plates_category_router import router as plates_category_router
@@ -17,10 +20,9 @@ from router.recovery_router import router as recovery_router
 from router.state_router import router as state_router
 from router.upload_router import router as upload_router
 from router.user_router import router as user_router
-from router.login_router import router as login_router
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from swagger.openapi import custom_openapi
 from worker.sqs_worker import start_sqs_background_task
-from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -32,8 +34,16 @@ app.add_middleware(
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
+
+app.openapi = custom_openapi(app)
+@app.get("/documentation", include_in_schema=False)
+async def swagger_documentation():
+    return get_swagger_ui_html(
+        openapi_url="/openapi.json", title="FastAPI - Documentation"
+    )
+
 
 start_sqs_background_task(app)
 
