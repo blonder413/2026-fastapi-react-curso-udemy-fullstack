@@ -20,11 +20,20 @@ from router.user_router import router as user_router
 from router.login_router import router as login_router
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from worker.sqs_worker import start_sqs_background_task
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 start_sqs_background_task(app)
 
