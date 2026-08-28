@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="482.78659"
+   height="482.78659"
+   viewBox="0 0 127.73729 127.73729"
+   version="1.1"
+   id="svg461"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="logo.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview463"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="true"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="false"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="false"
+     showborder="true"
+     borderlayer="true"
+     shape-rendering="auto"
+     inkscape:zoom="0.69664703"
+     inkscape:cx="201.68033"
+     inkscape:cy="131.34342"
+     inkscape:window-width="1882"
+     inkscape:window-height="1012"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs458" />
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-0.16633928,0.04041784)">
+    <g
+       transform="matrix(1.0644774,0,0,1.0644774,0.16633928,-0.04041784)"
+       id="g149"
+       inkscape:export-filename="../../../../../media/blonder413/JUEGOS/Descargas/favicon.ico"
+       inkscape:export-xdpi="17.462482"
+       inkscape:export-ydpi="17.462482">
+      <circle
+         cx="60"
+         cy="60"
+         r="60"
+         fill="#f0b800"
+         id="circle143" />
+      <rect
+         x="16"
+         y="22"
+         width="9"
+         height="76"
+         rx="4"
+         fill="#0e0e18"
+         id="rect145" />
+      <text
+         x="74"
+         y="91"
+         text-anchor="middle"
+         class="m"
+         font-size="78px"
+         font-weight="800"
+         fill="#0e0e18"
+         id="text147"
+         style="font-family:'JetBrains Mono', 'Courier New', monospace">b</text>
+    </g>
+  </g>
+</svg>
