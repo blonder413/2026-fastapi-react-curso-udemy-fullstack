@@ -1,8 +1,24 @@
 import { useState } from "react";
+import dayjs from "dayjs";
+import "dayjs/locale/es";
 
 const Header = () => {
   const [valorMenu, setValorMenu] = useState("hide");
   const [iconMenu, setIconMenu] = useState("fa-long-arrow-alt-left");
+
+  const getCurrentDate = () => {
+    dayjs.locale("es");
+    const date = new Date();
+    let day = dayjs(date).format("ddd");
+    day = day.charAt(0).toUpperCase() + day.slice(1);
+    const formattedDate =
+      day +
+      " " +
+      dayjs(date).format("DD") +
+      " de " +
+      dayjs(date).format("MMM") + " " + dayjs(date).format("YYYY");
+    return formattedDate;
+  };
 
   const setMenu = () => {
     const e = document.getElementsByClassName("js-sidebar")[0];
@@ -39,7 +55,9 @@ const Header = () => {
             >
               <i className="fas fa-long-arrow-alt-down align-middle"></i>
             </a>
-            <a className="nav-link d-none d-sm-inline-block">fecha</a>
+            <a className="nav-link d-none d-sm-inline-block">
+              {getCurrentDate()}
+            </a>
             <a className="nav-link d-none d-sm-inline-block">
               <span className="text-dark">|</span>
             </a>

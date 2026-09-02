@@ -89,3 +89,8 @@ docker exec -it curso-fastapi-node npm outdated
 ```sh
 docker exec -it -u root curso-fastapi-node npm run dev -- --host 0.0.0.0
 ```
+
+# Install packages
+```sh
+docker exec -it -u root curso-fastapi-node npm i dayjs
+```
