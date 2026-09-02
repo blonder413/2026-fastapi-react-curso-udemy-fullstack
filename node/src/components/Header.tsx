@@ -1,9 +1,33 @@
+import { useState } from "react";
+
 const Header = () => {
+  const [valorMenu, setValorMenu] = useState("hide");
+  const [iconMenu, setIconMenu] = useState("fa-long-arrow-alt-left");
+
+  const setMenu = () => {
+    const e = document.getElementsByClassName("js-sidebar")[0];
+    (e.classList.toggle("collapsed"),
+      e.addEventListener("transitionend", function () {
+        window.dispatchEvent(new Event("resize"));
+        if (valorMenu == "show") {
+          setValorMenu("hide");
+          setIconMenu("fa-long-arrow-alt-left");
+        } else {
+          setValorMenu("show");
+          setIconMenu("fa-long-arrow-alt-right");
+        }
+      }));
+  };
+
   return (
     <nav className="navbar navbar-expand navbar-light navbar-bg">
-      <a className="sidebar-toggle js-sidebar-toggle">
-        <i className="fas fa-long-arrow-alt-left"></i>
-      </a>
+      <button
+        className="btn btn-link p-0 border-0 text-decoration-none sidebar-toggle"
+        onClick={setMenu}
+        title={valorMenu}
+      >
+        <i className={`fas ${iconMenu} align-self-center`}></i>
+      </button>
 
       <div className="navbar-collapse collapse">
         <ul className="navbar-nav navbar-align">
