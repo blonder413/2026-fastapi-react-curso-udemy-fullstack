@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Form } from "react-bootstrap";
+import { login } from "../services/login.api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -23,12 +24,18 @@ const Login = () => {
     }
   };
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     validateForm();
 
-    console.log(email, password);
+    const response = await login({ email: email, password: password });
+    if (response[1] == 200) {
+      console.debug(response);
+    } else {
+      alert("Error");
+      globalThis.location.href="/login"
+    }
   };
 
   return (
