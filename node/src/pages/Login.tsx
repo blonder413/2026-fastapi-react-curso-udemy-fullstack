@@ -1,6 +1,15 @@
+import React, { useState } from "react";
 import { Form } from "react-bootstrap";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(email, password);
+  };
+
   return (
     <main className="d-flex w-100">
       <div className="container d-flex flex-column">
@@ -25,18 +34,45 @@ const Login = () => {
                         width="132"
                       />
                     </div>
-                    <Form id="form" noValidate>
+                    <Form id="form" noValidate onSubmit={handleSubmit}>
                       <div className="mb-3">
-                        <label htmlFor="email" className="form-label">Correo</label>
-                        <input type="text" id="email" className="form-control" placeholder="joedoe@example.com" />
+                        <label htmlFor="email" className="form-label">
+                          Correo
+                        </label>
+                        <input
+                          type="text"
+                          id="email"
+                          className="form-control"
+                          placeholder="joedoe@example.com"
+                          value={email}
+                          onChange={(e) => {
+                            setEmail(e.target.value);
+                          }}
+                        />
                       </div>
                       <div className="mb-3">
-                        <label htmlFor="password" className="form-label">Contraseña</label>
-                        <input type="password" id="password" className="form-control" />
+                        <label htmlFor="password" className="form-label">
+                          Contraseña
+                        </label>
+                        <input
+                          type="password"
+                          id="password"
+                          className="form-control"
+                          value={password}
+                          onChange={(e) => {
+                            setPassword(e.target.value);
+                          }}
+                        />
                       </div>
                       <div className="text-center mt-3">
                         <div className="col12 text-center">
-                          <button className="btn btn-lg btn-primary" id="login" title="Iniciar sesión"><i className="fas fa-lock-open"></i> Ingresar</button>
+                          <button
+                            className="btn btn-lg btn-primary"
+                            id="login"
+                            title="Iniciar sesión"
+                          >
+                            <i className="fas fa-lock-open"></i> Ingresar
+                          </button>
                         </div>
                       </div>
                     </Form>
