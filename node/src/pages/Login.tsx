@@ -5,8 +5,29 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const validateForm = () => {
+    if (email.length == 0 || email == "") {
+      alert("El correo es obligatorio");
+      return;
+    }
+
+    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email)) {
+      alert("El correo no es válido");
+      setEmail("");
+      return false;
+    }
+
+    if (password.length == 0 || password == "") {
+      alert("La contraseña es obligatorio");
+      return;
+    }
+  };
+
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    validateForm();
+
     console.log(email, password);
   };
 
