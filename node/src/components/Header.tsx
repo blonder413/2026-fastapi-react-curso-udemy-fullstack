@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 
 const Header = () => {
   const [valorMenu, setValorMenu] = useState("hide");
   const [iconMenu, setIconMenu] = useState("fa-long-arrow-alt-left");
+  const [time, setTime] = useState(new Date().toLocaleTimeString());
 
   const getCurrentDate = () => {
     dayjs.locale("es");
@@ -16,7 +17,9 @@ const Header = () => {
       " " +
       dayjs(date).format("DD") +
       " de " +
-      dayjs(date).format("MMM") + " " + dayjs(date).format("YYYY");
+      dayjs(date).format("MMM") +
+      " " +
+      dayjs(date).format("YYYY");
     return formattedDate;
   };
 
@@ -35,6 +38,11 @@ const Header = () => {
       }));
   };
 
+  useEffect(() => {
+    setInterval(() => {
+      setTime(new Date().toLocaleTimeString());
+    }, 1000);
+  }, []);
   return (
     <nav className="navbar navbar-expand navbar-light navbar-bg">
       <button
@@ -61,7 +69,7 @@ const Header = () => {
             <a className="nav-link d-none d-sm-inline-block">
               <span className="text-dark">|</span>
             </a>
-            <a className="nav-link d-none d-sm-inline-block">reloj</a>
+            <a className="nav-link d-none d-sm-inline-block">{time}</a>
             <a className="nav-link d-none d-sm-inline-block">
               <span className="text-dark">|</span>
             </a>
