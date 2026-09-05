@@ -5,13 +5,15 @@ import Frontend from "./components/Frontend";
 import Home from "./pages/Home";
 import Error404 from "./pages/Error404";
 import Error500 from "./pages/Error500";
+import Login from "./pages/Login";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Frontend />,
     children: [
-      { index: true, element: <Home />, errorElement:<Error500 /> },
+      { index: true, element: <Home />, errorElement: <Error500 /> },
+      { path: "/login", element: <Login />, errorElement: <Error500 /> },
       { path: "*", element: <Error404 /> },
     ],
   },
