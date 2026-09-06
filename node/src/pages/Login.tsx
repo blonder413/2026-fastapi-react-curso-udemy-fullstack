@@ -45,6 +45,7 @@ const Login = () => {
     if (response[1] == 200) {
       const { data } = response[0];
       handleLogin(data.id, data.name, data.token, data.profile);
+      globalThis.location.href = "/";
     } else {
       alert("Error");
       globalThis.location.href = "/login";
