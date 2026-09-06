@@ -1,9 +1,16 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Form } from "react-bootstrap";
 import { login } from "../services/login.api";
 import Spinner from "../components/Spinner";
+import AuthContext from "../context/AuthProvider";
 
 const Login = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    return <div>No se pudo cargar el contexto</div>;
+  }
+  const { handleLogin } = context;
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [button, setButton] = useState("block");
@@ -36,7 +43,8 @@ const Login = () => {
     setPreloader("block");
     const response = await login({ email: email, password: password });
     if (response[1] == 200) {
-      console.debug(response);
+      const { data } = response[0];
+      handleLogin(data.id, data.name, data.token, data.profile);
     } else {
       alert("Error");
       globalThis.location.href = "/login";
