@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { Form } from "react-bootstrap";
 import { login } from "../services/login.api";
+import Spinner from "../components/Spinner";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [button, setButton] = useState("block");
+  const [preloader, setPreloader] = useState("none");
 
   const validateForm = () => {
     if (email.length == 0 || email == "") {
@@ -29,12 +32,14 @@ const Login = () => {
 
     validateForm();
 
+    setButton("none");
+    setPreloader("block");
     const response = await login({ email: email, password: password });
     if (response[1] == 200) {
       console.debug(response);
     } else {
       alert("Error");
-      globalThis.location.href="/login"
+      globalThis.location.href = "/login";
     }
   };
 
@@ -93,7 +98,10 @@ const Login = () => {
                         />
                       </div>
                       <div className="text-center mt-3">
-                        <div className="col12 text-center">
+                        <div
+                          className="col-12 text-center"
+                          style={{ display: button }}
+                        >
                           <button
                             className="btn btn-lg btn-primary"
                             id="login"
@@ -101,6 +109,12 @@ const Login = () => {
                           >
                             <i className="fas fa-lock-open"></i> Ingresar
                           </button>
+                        </div>
+                        <div
+                          className="col-12 text-center"
+                          style={{ display: preloader }}
+                        >
+                          <Spinner />
                         </div>
                       </div>
                     </Form>
