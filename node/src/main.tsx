@@ -1,11 +1,12 @@
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import "/public/css/app.css";
 import Frontend from "./components/Frontend";
-import Home from "./pages/Home";
+import { AuthProvider } from "./context/AuthProvider";
 import Error404 from "./pages/Error404";
 import Error500 from "./pages/Error500";
+import Home from "./pages/Home";
 import Login from "./pages/Login";
+import "/public/css/app.css";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,8 @@ const router = createBrowserRouter([
 const rootElement = document.getElementById("root");
 if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
-    <RouterProvider router={router}></RouterProvider>,
+    <AuthProvider>
+      <RouterProvider router={router} />,
+    </AuthProvider>,
   );
 }
