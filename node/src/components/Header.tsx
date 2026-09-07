@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
+import type { User } from "../interfaces/User.interface";
+import { findOne } from "../services/user.api";
+import { errorSession } from "../helpers/helpers";
 
 const Header = () => {
   const [valorMenu, setValorMenu] = useState("hide");
   const [iconMenu, setIconMenu] = useState("fa-long-arrow-alt-left");
   const [time, setTime] = useState(new Date().toLocaleTimeString());
+  const [user, setUser] = useState<User>();
 
   const getCurrentDate = () => {
     dayjs.locale("es");
@@ -43,6 +47,27 @@ const Header = () => {
       setTime(new Date().toLocaleTimeString());
     }, 1000);
   }, []);
+
+  useEffect(() => {
+    const findUser = async () => {
+      const id = localStorage.getItem("menu_id");
+      if (id) {
+        try {
+          const [data, status] = await findOne(Number(id));
+          if (status == 200) {
+            setUser(data.response);
+            localStorage.setItem("menu_profile_id", data.response.profile_id);
+          } else {
+            errorSession();
+          }
+        } catch (error) {
+          errorSession();
+        }
+      }
+    };
+    findUser();
+  }, []);
+
   return (
     <nav className="navbar navbar-expand navbar-light navbar-bg">
       <button
@@ -73,7 +98,7 @@ const Header = () => {
             <a className="nav-link d-none d-sm-inline-block">
               <span className="text-dark">|</span>
             </a>
-            <a className="nav-link d-none d-sm-inline-block">perfil</a>
+            <a className="nav-link d-none d-sm-inline-block">{user?.profile}</a>
             <a className="nav-link d-none d-sm-inline-block">
               <span className="text-dark">|</span>
             </a>
@@ -82,7 +107,7 @@ const Header = () => {
               href="#"
               data-bs-toggle="dropdown"
             >
-              <span className="text-dark">nombre</span>
+              <span className="text-dark">{user?.name}</span>
               <img
                 src="/img/perfil.png"
                 className="avatar img-fluid rounded me-1"
