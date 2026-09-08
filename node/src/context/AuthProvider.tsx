@@ -6,7 +6,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [auth, setAuth] = useState<boolean>(
-    localStorage.getItem("menu_id") != null,
+    localStorage.getItem("menu_token") != null,
   );
 
   const handleLogin = (
@@ -22,8 +22,21 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     setAuth(true);
   };
 
+  const checkSession = () => {
+    const token = localStorage.getItem("menu_token");
+
+    if (token === null) {
+      setAuth(false);
+      globalThis.location.href = "/login";
+      return false;
+    }
+
+    setAuth(true);
+    return true;
+  };
+
   return (
-    <AuthContext.Provider value={{ auth, handleLogin }}>
+    <AuthContext.Provider value={{ auth, handleLogin, checkSession }}>
       {children}
     </AuthContext.Provider>
   );

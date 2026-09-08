@@ -6,4 +6,5 @@ export type AuthContextType = {
     token: string,
     profile_id: string,
   ) => void;
+  checkSession: () => boolean;
 };
