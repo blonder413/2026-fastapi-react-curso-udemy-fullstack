@@ -43,8 +43,16 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const checkAccess = (profile_id: string) => {
+    if (localStorage.getItem("menu_profile_id") != profile_id) {
+      globalThis.location.href = "/error";
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ auth, handleLogin, checkSession, logout }}>
+    <AuthContext.Provider
+      value={{ auth, handleLogin, checkSession, logout, checkAccess }}
+    >
       {children}
     </AuthContext.Provider>
   );

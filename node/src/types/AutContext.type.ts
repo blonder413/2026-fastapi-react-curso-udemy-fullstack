@@ -8,4 +8,5 @@ export type AuthContextType = {
   ) => void;
   checkSession: () => boolean;
   logout: () => void;
+  checkAccess: (profile_id: string) => void;
 };
