@@ -1,11 +1,18 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import type { User } from "../interfaces/User.interface";
 import { findOne } from "../services/user.api";
 import { errorSession } from "../helpers/helpers";
+import AuthContext from "../context/AuthProvider";
 
 const Header = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    return <div>No se ha cargado el context</div>;
+  }
+  const { logout } = context;
+
   const [valorMenu, setValorMenu] = useState("hide");
   const [iconMenu, setIconMenu] = useState("fa-long-arrow-alt-left");
   const [time, setTime] = useState(new Date().toLocaleTimeString());
@@ -114,10 +121,14 @@ const Header = () => {
               />
             </a>
             <div className="dropdown-menu dropdown-menu-end">
-              <a className="dropdown-item" title="Cerrar sesión">
+              <button
+                className="dropdown-item"
+                onClick={logout}
+                title="Cerrar sesión"
+              >
                 <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>{" "}
                 Cerrar sesión
-              </a>
+              </button>
             </div>
           </li>
         </ul>

@@ -35,8 +35,16 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     return true;
   };
 
+  const logout = () => {
+    if (window.confirm("¿desea cerrar sesión?")) {
+      localStorage.clear();
+      setAuth(false);
+      globalThis.location.href = "/login";
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ auth, handleLogin, checkSession }}>
+    <AuthContext.Provider value={{ auth, handleLogin, checkSession, logout }}>
       {children}
     </AuthContext.Provider>
   );
