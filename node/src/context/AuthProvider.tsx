@@ -1,6 +1,8 @@
 import { createContext, useState } from "react";
 import type { AuthContextType } from "../types/AutContext.type";
 import type { AuthProviderProps } from "../types/AuthProviderProps.type";
+import type { CustomAlertInterface } from "../components/ui/CustomAlert";
+import CustomAlert from "../components/ui/CustomAlert";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -8,6 +10,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const [auth, setAuth] = useState<boolean>(
     localStorage.getItem("menu_token") != null,
   );
+  const [confirmData, setConfirmData] = useState<CustomAlertInterface | null>(
+    null,
+  );
+
+  const showConfirm = (confirmData: Omit<CustomAlertInterface, "state">) => {
+    setConfirmData({ ...confirmData, state: true });
+  };
 
   const handleLogin = (
     id: string,
@@ -36,11 +45,18 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const logout = () => {
-    if (window.confirm("¿desea cerrar sesión?")) {
-      localStorage.clear();
-      setAuth(false);
-      globalThis.location.href = "/login";
-    }
+    showConfirm({
+      title: "Cerrar Sesión",
+      detail: "¿Realmente desea cerrar la sesión?",
+      headerBg: "bg-info",
+      isConfirm: true,
+      onConfirm: () => {
+        localStorage.clear();
+        setAuth(false);
+        globalThis.location.href = "/login";
+      },
+      onClose: () => setConfirmData(null),
+    });
   };
 
   const checkAccess = (profile_id: string) => {
@@ -51,9 +67,29 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return (
     <AuthContext.Provider
-      value={{ auth, handleLogin, checkSession, logout, checkAccess }}
+      value={{
+        auth,
+        handleLogin,
+        checkSession,
+        logout,
+        checkAccess,
+        showConfirm,
+        confirmData,
+        setConfirmData,
+      }}
     >
       {children}
+      {confirmData && (
+        <CustomAlert
+          state={confirmData.state}
+          title={confirmData.title}
+          detail={confirmData.detail}
+          onClose={confirmData.onClose}
+          onConfirm={confirmData.onConfirm}
+          headerBg={confirmData.headerBg}
+          isConfirm={confirmData.isConfirm}
+        />
+      )}
     </AuthContext.Provider>
   );
 };
