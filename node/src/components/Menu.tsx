@@ -1,11 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Menu = () => {
+  const location = useLocation();
+  const isActive = (path: any, exact = false) => {
+    return exact
+      ? location.pathname == path
+      : location.pathname.startsWith(path);
+  };
+
   const renderAdministration = () => {
     return (
       <>
         <li className="sidebar-header">Administración</li>
-        <li className="sidebar-item">
+        <li className={`sidebar-item ${isActive("/perfiles") ? "active" : ""}`}>
           <Link
             to="/perfiles"
             className="sidebar-link"
@@ -15,7 +22,7 @@ const Menu = () => {
             <span className="align-middle">Perfil</span>
           </Link>
         </li>
-        <li className="sidebar-item">
+        <li className={`sidebar-item ${isActive("/usuarios") ? "active" : ""}`}>
           <Link
             to="/usuarios"
             className="sidebar-link"
@@ -25,7 +32,9 @@ const Menu = () => {
             <span className="align-middle">Usuarios</span>
           </Link>
         </li>
-        <li className="sidebar-item">
+        <li
+          className={`sidebar-item ${isActive("/negocios/categorias") ? "active" : ""}`}
+        >
           <Link
             to="/negocios/categorias"
             className="sidebar-link"
@@ -35,7 +44,9 @@ const Menu = () => {
             <span className="align-middle">Categorías</span>
           </Link>
         </li>
-        <li className="sidebar-item">
+        <li
+          className={`sidebar-item ${isActive("/negocios/listar") ? "active" : ""}`}
+        >
           <Link
             to="/negocios/listar"
             className="sidebar-link"
@@ -53,7 +64,7 @@ const Menu = () => {
     return (
       <>
         <li className="sidebar-header">Mi Negocio</li>
-        <li className="sidebar-item">
+        <li className={`sidebar-item ${isActive("/") ? "active" : ""}`}>
           <Link
             to="/mi-negocio"
             className="sidebar-link"
