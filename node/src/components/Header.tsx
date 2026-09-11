@@ -41,10 +41,10 @@ const Header = () => {
         window.dispatchEvent(new Event("resize"));
         if (valorMenu == "show") {
           setValorMenu("hide");
-          setIconMenu("fa-long-arrow-alt-left");
+          setIconMenu("fa-long-arrow-alt-right");
         } else {
           setValorMenu("show");
-          setIconMenu("fa-long-arrow-alt-right");
+          setIconMenu("fa-long-arrow-alt-left");
         }
       }));
   };
