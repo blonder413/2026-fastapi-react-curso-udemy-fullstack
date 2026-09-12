@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import "/public/css/app.css";
 import Recovery from "./pages/Recovery";
+import UpdatePassword from "./pages/UpdatePassword";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,11 @@ const router = createBrowserRouter([
   {
     path: "/restablecer",
     element: <Recovery />,
+  },
+  {
+    path: "/recovery/update/:token",
+    element: <UpdatePassword />,
+    errorElement: <Error500 />,
   },
 ]);
 const rootElement = document.getElementById("root");
