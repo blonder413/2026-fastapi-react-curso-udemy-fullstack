@@ -7,6 +7,7 @@ import Error500 from "./pages/Error500";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import "/public/css/app.css";
+import Recovery from "./pages/Recovery";
 
 const router = createBrowserRouter([
   {
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
       { path: "/login", element: <Login />, errorElement: <Error500 /> },
       { path: "*", element: <Error404 /> },
     ],
+  },
+  {
+    path: "/restablecer",
+    element: <Recovery />,
   },
 ]);
 const rootElement = document.getElementById("root");

@@ -5,6 +5,7 @@ import Spinner from "../components/Spinner";
 import AuthContext from "../context/AuthProvider";
 import type { CustomAlertInterface } from "../components/ui/CustomAlert";
 import CustomAlert from "../components/ui/CustomAlert";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const context = useContext(AuthContext);
@@ -163,6 +164,9 @@ const Login = () => {
                           >
                             <Spinner />
                           </div>
+
+                          <hr />
+                          <Link to="/restablecer">Restablecer contraseña</Link>
                         </div>
                       </Form>
                     </div>
