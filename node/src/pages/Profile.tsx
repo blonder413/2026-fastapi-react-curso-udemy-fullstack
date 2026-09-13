@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import Menu from "../components/Menu";
 import AuthContext from "../context/AuthProvider";
 import { Breadcrumb, Form, Modal } from "react-bootstrap";
-import { create, findAll } from "../services/profile.api";
+import { create, findAll, update } from "../services/profile.api";
 import { useLoaderData } from "react-router-dom";
 import type { Profile } from "../interfaces/Profile.interface";
 import Footer from "../components/Footer";
@@ -38,6 +38,13 @@ const Profile = () => {
 
   const handleCreate = () => {
     setAction(1);
+    handleShow();
+  };
+
+  const handleEdit = (profile: Profile) => {
+    setAction(2);
+    setActionId(profile.id);
+    setName(profile.name);
     handleShow();
   };
 
@@ -80,8 +87,26 @@ const Profile = () => {
       setInterval(() => {
         globalThis.location.href = location.href;
       }, 2000);
+    } else {
+      if ((await update({ id: actionId, name: name })) == 200) {
+        setCustomAlert({
+          state: true,
+          title: "Editado",
+          detail: "Registro editado exitosamente",
+          headerBg: "bg-success",
+        });
+        setInterval(() => {
+          globalThis.location.href = location.href;
+        }, 2000);
+      } else {
+        setCustomAlert({
+          state: true,
+          title: "Error",
+          detail: "Error al editar el registro",
+          headerBg: "bg-danger",
+        });
+      }
     }
-    console.debug(name);
   };
 
   const renderButton = () => {
@@ -148,7 +173,15 @@ const Profile = () => {
                               <tr key={profile.id}>
                                 <td>{profile.id}</td>
                                 <td>{profile.name}</td>
-                                <td></td>
+                                <td className="text-center">
+                                  <button
+                                    className="btn btn-sm"
+                                    onClick={() => handleEdit(profile)}
+                                    title="Editar"
+                                  >
+                                    <i className="fas fa-edit text-primary"></i>
+                                  </button>
+                                </td>
                               </tr>
                             ))}
                           </tbody>

@@ -36,3 +36,17 @@ export const create = async (dto: Profile) => {
       console.error(error);
     });
 };
+
+export const update = async (dto: Profile) => {
+  return axios
+    .put(basePath + "/" + dto.id, dto, {
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => response.status)
+    .catch((error) => {
+      console.error(error);
+    });
+};
