@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import Menu from "../components/Menu";
 import AuthContext from "../context/AuthProvider";
 import { Breadcrumb, Form, Modal } from "react-bootstrap";
-import { create, findAll, update } from "../services/profile.api";
+import { create, findAll, remove, update } from "../services/profile.api";
 import { useLoaderData } from "react-router-dom";
 import type { Profile } from "../interfaces/Profile.interface";
 import Footer from "../components/Footer";
@@ -20,7 +20,7 @@ const Profile = () => {
   if (!context) {
     return <h1>No fue posible cargar el contexto</h1>;
   }
-  const { checkAccess } = context;
+  const { checkAccess, setConfirmData, showConfirm } = context;
   const [data] = useLoaderData();
   const [show, setShow] = useState(false);
   const [action, setAction] = useState(1);
@@ -46,6 +46,37 @@ const Profile = () => {
     setActionId(profile.id);
     setName(profile.name);
     handleShow();
+  };
+
+  const handleDelete = async (id: number) => {
+    showConfirm({
+      title: "Eliminar",
+      detail: "¿Realmente desea eliminar este registro?",
+      headerBg: "bg-warning",
+      isConfirm: true,
+      onConfirm: async () => {
+        try {
+          await remove(id);
+          setCustomAlert({
+            state: true,
+            title: "Eliminado",
+            detail: "Registro eliminado exitosamente",
+            headerBg: "bg-success",
+          });
+          setInterval(() => {
+            globalThis.location.href = location.href;
+          }, 2000);
+        } catch (error) {
+          setCustomAlert({
+            state: true,
+            title: "Error",
+            detail: "Error al eliminar el registro",
+            headerBg: "bg-danger",
+          });
+        }
+      },
+      onClose: () => setConfirmData(null),
+    });
   };
 
   const validateForm = () => {
@@ -180,6 +211,14 @@ const Profile = () => {
                                     title="Editar"
                                   >
                                     <i className="fas fa-edit text-primary"></i>
+                                  </button>
+
+                                  <button
+                                    className="btn btn-sm"
+                                    onClick={() => handleDelete(profile.id)}
+                                    title="Eliminar"
+                                  >
+                                    <i className="fas fa-trash text-primary"></i>
                                   </button>
                                 </td>
                               </tr>

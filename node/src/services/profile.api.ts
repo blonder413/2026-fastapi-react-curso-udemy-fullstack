@@ -50,3 +50,17 @@ export const update = async (dto: Profile) => {
       console.error(error);
     });
 };
+
+export const remove = async (id: number) => {
+  return axios
+    .delete(basePath + "/" + id, {
+      headers: {
+        "content-type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => response.status)
+    .catch((error) => {
+      console.error(error);
+    });
+};
