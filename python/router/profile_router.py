@@ -38,7 +38,7 @@ async def show(id: int, session: Annotated[Session, Depends(get_session)]):
     )
 
 
-@router.post("", response_model=ResponseInterface[Profile])
+@router.post("/", response_model=ResponseInterface[Profile])
 async def create(dto: ProfileDto, session: Annotated[Session, Depends(get_session)]):
     exists = session.query(Profile).filter(Profile.name == dto.name).first()
     if exists:
