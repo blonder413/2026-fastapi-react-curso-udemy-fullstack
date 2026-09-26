@@ -33,6 +33,7 @@ def get_current_user(
             token, os.getenv("SECRET_KEY"), algorithms=[os.getenv("ALGORITHM")]
         )
         user_id: int = int(payload.get("sub"))
+        print(user_id)
         if user_id is None:
             raise credentials_exception
     except JWTError:

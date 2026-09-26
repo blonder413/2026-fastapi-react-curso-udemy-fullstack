@@ -5,5 +5,6 @@ export interface User {
   state_id: number;
   profile_id: number;
   profile: string;
-  data: string;
+  state: string;
+  date: string;
 }

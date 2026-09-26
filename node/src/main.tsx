@@ -10,6 +10,8 @@ import "/public/css/app.css";
 import Recovery from "./pages/Recovery";
 import UpdatePassword from "./pages/UpdatePassword";
 import Profile, { loader as profileLoader } from "./pages/Profile";
+import User from "./pages/User";
+import { loader as userLoader } from "./loaders/user";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +25,12 @@ const router = createBrowserRouter([
         element: <Profile />,
         errorElement: <Error500 />,
         loader: profileLoader,
+      },
+      {
+        path: "/usuarios",
+        element: <User />,
+        errorElement: <Error500 />,
+        loader: userLoader,
       },
       { path: "*", element: <Error404 /> },
     ],

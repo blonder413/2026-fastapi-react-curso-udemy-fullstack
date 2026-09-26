@@ -85,6 +85,11 @@ Ver actualizaciones pendientes
 docker exec -it curso-fastapi-node npm outdated
 ```
 
+Instalar actualizaciones
+```sh
+docker exec -it -u root curso-fastapi-node npm update
+```
+
 # Run server
 ```sh
 docker exec -it -u root curso-fastapi-node npm run dev -- --host 0.0.0.0

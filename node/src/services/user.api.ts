@@ -10,3 +10,13 @@ export const findOne = async (id: number) => {
   });
   return [await response.json(), response.status];
 };
+
+export const findAll = async () => {
+  const response = await fetch(`${base_url}`, {
+    headers: {
+      "content-type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return await response.json();
+};
