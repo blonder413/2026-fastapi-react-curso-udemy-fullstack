@@ -9,6 +9,7 @@ import AuthContext from "../context/AuthProvider";
 import type { CustomAlertInterface } from "../components/ui/CustomAlert";
 import CustomAlert from "../components/ui/CustomAlert";
 import type { State } from "../interfaces/State.interface";
+import type { Profile } from "../interfaces/Profile.interface";
 
 const User = () => {
   const context = useContext(AuthContext);
@@ -184,6 +185,24 @@ const User = () => {
               </div>
 
               <div className="col-lg-12">
+                <label htmlFor="profile_id">Perfil</label>
+                <select
+                  className="form-control"
+                  id="profile_id"
+                  value={profileId}
+                  onChange={(e) => {
+                    setProfileId(e.target.value);
+                  }}
+                >
+                  {profiles.response.map((profile: Profile) => (
+                    <option key={profile.id} value={profile.id}>
+                      {profile.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="col-lg-12">
                 <label htmlFor="name" className="form-label">
                   Nombre
                 </label>
@@ -200,6 +219,7 @@ const User = () => {
                 />
               </div>
             </section>
+
             <hr />
             <div className="row">
               <div className="col-6"></div>
