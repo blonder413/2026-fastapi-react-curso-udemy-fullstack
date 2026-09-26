@@ -10,6 +10,7 @@ import type { CustomAlertInterface } from "../components/ui/CustomAlert";
 import CustomAlert from "../components/ui/CustomAlert";
 import type { State } from "../interfaces/State.interface";
 import type { Profile } from "../interfaces/Profile.interface";
+import type { Action } from "../types/Action.type";
 
 const User = () => {
   const context = useContext(AuthContext);
@@ -26,7 +27,7 @@ const User = () => {
   const [stateId, setStateId] = useState(0);
 
   const [show, setShow] = useState(false);
-  const [action, setAction] = useState(1);
+  const [action, setAction] = useState<Action>("create");
   const [actionId, setActionId] = useState<number | undefined>();
   const [customAlert, setCustomAlert] = useState<CustomAlertInterface>({
     state: false,
@@ -62,7 +63,7 @@ const User = () => {
     setEmail("");
     setPassword("");
     setProfileId(0);
-    setAction(1);
+    setAction("create");
     handleShow();
     console.debug("Create");
   };
@@ -161,28 +162,30 @@ const User = () => {
       </section>
       <Modal show={show} onHide={handleClose} dialogClassName="modal-90w">
         <Modal.Header closeButton>
-          <Modal.Title>{action == 1 ? "Crear" : "Editar"}</Modal.Title>
+          <Modal.Title>{action == "create" ? "Crear" : "Editar"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
             <section className="row gy-3">
-              <div className="col-lg-12">
-                <label htmlFor="state_id">Estado</label>
-                <select
-                  className="form-control"
-                  id="state_id"
-                  value={stateId}
-                  onChange={(e) => {
-                    setStateId(e.target.value);
-                  }}
-                >
-                  {states.response.map((state: State) => (
-                    <option key={state.id} value={state.id}>
-                      {state.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {action == "edit" && (
+                <div className="col-lg-12">
+                  <label htmlFor="state_id">Estado</label>
+                  <select
+                    className="form-control"
+                    id="state_id"
+                    value={stateId}
+                    onChange={(e) => {
+                      setStateId(e.target.value);
+                    }}
+                  >
+                    {states.response.map((state: State) => (
+                      <option key={state.id} value={state.id}>
+                        {state.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div className="col-lg-12">
                 <label htmlFor="profile_id">Perfil</label>
