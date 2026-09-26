@@ -221,6 +221,40 @@ const User = () => {
                   }}
                 />
               </div>
+
+              <div className="col-lg-12">
+                <label htmlFor="email" className="form-label">
+                  Correo
+                </label>
+                <input
+                  autoFocus
+                  className="form-control"
+                  type="email"
+                  id="email"
+                  placeholder="joedoe@example.com"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                  }}
+                />
+              </div>
+
+              <div className="col-lg-12">
+                <label htmlFor="password" className="form-label">
+                  Contraseña
+                </label>
+                <input
+                  autoFocus
+                  className="form-control"
+                  type="password"
+                  id="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                  }}
+                />
+              </div>
             </section>
 
             <hr />
