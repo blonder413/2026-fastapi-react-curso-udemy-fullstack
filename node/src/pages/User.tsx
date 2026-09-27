@@ -11,7 +11,7 @@ import CustomAlert from "../components/ui/CustomAlert";
 import type { State } from "../interfaces/State.interface";
 import type { Profile } from "../interfaces/Profile.interface";
 import type { Action } from "../types/Action.type";
-import { create } from "../services/user.api";
+import { create, update } from "../services/user.api";
 
 const User = () => {
   const context = useContext(AuthContext);
@@ -68,6 +68,16 @@ const User = () => {
     handleShow();
   };
 
+  const handleEdit = (user: UserInterface) => {
+    setActionId(user.id);
+    setName(user.name);
+    setEmail(user.email);
+    setProfileId(user.profile_id);
+    setStateId(user.state_id);
+    setAction("edit");
+    handleShow();
+  };
+
   const validateForm = () => {
     if (profileId == 0) {
       setCustomAlert({
@@ -112,14 +122,16 @@ const User = () => {
       return false;
     }
 
-    if (password.length == 0 || password == "") {
-      setCustomAlert({
-        state: true,
-        title: "Alerta",
-        detail: "La contraseña es obligatoria",
-        headerBg: "bg-warning",
-      });
-      return false;
+    if (action == "create") {
+      if (password.length == 0 || password == "") {
+        setCustomAlert({
+          state: true,
+          title: "Alerta",
+          detail: "La contraseña es obligatoria",
+          headerBg: "bg-warning",
+        });
+        return false;
+      }
     }
 
     return true;
@@ -155,6 +167,37 @@ const User = () => {
           state: true,
           title: "Error",
           detail: "No fue posible registrar el usuario",
+          headerBg: "bg-danger",
+        });
+      }
+    }
+
+    if (action == "edit") {
+      const response = await update({
+        id: actionId,
+        name: name,
+        email: email,
+        password: password,
+        profile_id: profileId,
+        estado_id: stateId,
+        update_password: password.length > 0 ? 1 : 0,
+      });
+
+      if (response.status.status_code == 200) {
+        setCustomAlert({
+          state: true,
+          title: "Editado",
+          detail: "Registro editado exitosamente.",
+          headerBg: "bg-success",
+        });
+        setTimeout(() => {
+          globalThis.location.href = "/usuarios";
+        }, 2000);
+      } else {
+        setCustomAlert({
+          state: true,
+          title: "Error",
+          detail: "No fue posible editar el usuario",
           headerBg: "bg-danger",
         });
       }
@@ -224,6 +267,7 @@ const User = () => {
                                 <td>
                                   <button
                                     className="btn btn-sm"
+                                    onClick={() => handleEdit(user)}
                                     title={`Editar ${user.name}`}
                                   >
                                     <i className="fas fa-edit text-primary"></i>

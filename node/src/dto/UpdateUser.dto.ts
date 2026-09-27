@@ -4,5 +4,6 @@ export interface UpdateUserDto {
   email: string;
   password: string;
   profile_id: number;
-  state_id: number;
+  estado_id: number;
+  update_password: number
 }
