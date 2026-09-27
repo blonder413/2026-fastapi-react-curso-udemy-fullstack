@@ -11,6 +11,7 @@ import CustomAlert from "../components/ui/CustomAlert";
 import type { State } from "../interfaces/State.interface";
 import type { Profile } from "../interfaces/Profile.interface";
 import type { Action } from "../types/Action.type";
+import { create } from "../services/user.api";
 
 const User = () => {
   const context = useContext(AuthContext);
@@ -45,7 +46,7 @@ const User = () => {
   const renderButton = () => {
     return (
       <button className="btn btn-primary">
-        {action == 1 ? (
+        {action == "create" ? (
           <>
             <i className="fas fa-plus"></i> Crear
           </>
@@ -65,11 +66,99 @@ const User = () => {
     setProfileId(0);
     setAction("create");
     handleShow();
-    console.debug("Create");
+  };
+
+  const validateForm = () => {
+    if (profileId == 0) {
+      setCustomAlert({
+        state: true,
+        title: "Alerta",
+        detail: "El perfil es obligatorio",
+        headerBg: "bg-warning",
+      });
+      setProfileId(0);
+      return false;
+    }
+
+    if (name.trim() == "") {
+      setCustomAlert({
+        state: true,
+        title: "Alerta",
+        detail: "El nombre es obligatorio",
+        headerBg: "bg-warning",
+      });
+      setName("");
+      return false;
+    }
+
+    if (email.length == 0 || email == "") {
+      setCustomAlert({
+        state: true,
+        title: "Alerta",
+        detail: "El correo es obligatorio",
+        headerBg: "bg-warning",
+      });
+      return false;
+    }
+
+    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email)) {
+      setCustomAlert({
+        state: true,
+        title: "Alerta",
+        detail: "El correo no es válido",
+        headerBg: "bg-warning",
+      });
+      setEmail("");
+      return false;
+    }
+
+    if (password.length == 0 || password == "") {
+      setCustomAlert({
+        state: true,
+        title: "Alerta",
+        detail: "La contraseña es obligatoria",
+        headerBg: "bg-warning",
+      });
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    const isValid = validateForm();
+    if (!isValid) {
+      return;
+    }
+
+    if (action == "create") {
+      const response = await create({
+        name: name,
+        email: email,
+        password: password,
+        profile_id: profileId,
+      });
+      if (response.status.status_code == 200) {
+        setCustomAlert({
+          state: true,
+          title: "Creado",
+          detail: "Registro creado exitosamente.",
+          headerBg: "bg-success",
+        });
+        setInterval(() => {
+          globalThis.location.href = "/usuarios";
+        }, 2000);
+      } else {
+        setCustomAlert({
+          state: true,
+          title: "Error",
+          detail: "No fue posible registrar el usuario",
+          headerBg: "bg-danger",
+        });
+      }
+    }
   };
 
   useEffect(() => {
@@ -197,6 +286,7 @@ const User = () => {
                     setProfileId(e.target.value);
                   }}
                 >
+                  <option value="0">Seleccione...</option>
                   {profiles.response.map((profile: Profile) => (
                     <option key={profile.id} value={profile.id}>
                       {profile.name}
