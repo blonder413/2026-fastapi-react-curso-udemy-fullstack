@@ -11,14 +11,14 @@ import CustomAlert from "../components/ui/CustomAlert";
 import type { State } from "../interfaces/State.interface";
 import type { Profile } from "../interfaces/Profile.interface";
 import type { Action } from "../types/Action.type";
-import { create, update } from "../services/user.api";
+import { create, remove, update } from "../services/user.api";
 
 const User = () => {
   const context = useContext(AuthContext);
   if (!context) {
     return <h1>No fue posible cargar el contexto</h1>;
   }
-  const { checkAccess } = context;
+  const { checkAccess, showConfirm, setConfirmData } = context;
   const { data, profiles, states } = useLoaderData();
 
   const [name, setName] = useState("");
@@ -135,6 +135,37 @@ const User = () => {
     }
 
     return true;
+  };
+
+  const handleDelete = async (id: number) => {
+    showConfirm({
+      title: "Eliminar",
+      detail: "¿Realmente desea eliminar este registro?",
+      headerBg: "bg-warning",
+      isConfirm: true,
+      onConfirm: async () => {
+        try {
+          await remove(id);
+          setCustomAlert({
+            state: true,
+            title: "Eliminado",
+            detail: "Registro eliminado exitosamente",
+            headerBg: "bg-success",
+          });
+          setTimeout(() => {
+            globalThis.location.href = location.href;
+          }, 2000);
+        } catch (error) {
+          setCustomAlert({
+            state: true,
+            title: "Error",
+            detail: "Error al eliminar el registro",
+            headerBg: "bg-danger",
+          });
+        }
+      },
+      onClose: () => setConfirmData(null),
+    });
   };
 
   const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
@@ -274,6 +305,7 @@ const User = () => {
                                   </button>
                                   <button
                                     className="btn btn-sm"
+                                    onClick={() => handleDelete(user.id)}
                                     title={`Eliminar ${user.name}`}
                                   >
                                     <i className="fas fa-trash text-primary"></i>

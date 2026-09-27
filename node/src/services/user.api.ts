@@ -47,3 +47,14 @@ export const update = async (dto: UpdateUserDto) => {
   });
   return await response.json();
 };
+
+export const remove = async (id: number) => {
+  const response = await fetch(`${base_url}/${id}`, {
+    headers: {
+      "content-type": "application/json",
+      Authorization: authorization,
+    },
+    method: "DELETE",
+  });
+  return response.json();
+};
