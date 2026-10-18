@@ -6,6 +6,7 @@ import Menu from "../../components/Menu";
 import { useContext, useEffect } from "react";
 import AuthContext from "../../context/AuthProvider";
 import type { Business } from "../../interfaces/Business";
+import CustomImage from "../../components/ui/CustomImage";
 
 const Business = () => {
   const context = useContext(AuthContext);
@@ -76,12 +77,9 @@ const Business = () => {
                               <td>{business.category}</td>
                               <td>{business.name}</td>
                               <td className="text-center">
-                                <button
-                                  className="btn btn-sm"
-                                  title="Ver imagen"
-                                >
-                                  <i className="fas fa-image"></i>
-                                </button>
+                                <CustomImage imagenUrl={business.logo} titulo={`Logo ${business.name}`} >
+                                  <i className="fas fa-image" title={business.name}></i>
+                                </CustomImage>
                               </td>
                               <td className="text-center">
                                 <button
