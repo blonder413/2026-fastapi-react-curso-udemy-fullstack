@@ -12,6 +12,8 @@ import UpdatePassword from "./pages/UpdatePassword";
 import Profile, { loader as profileLoader } from "./pages/Profile";
 import User from "./pages/User";
 import { loader as userLoader } from "./loaders/user";
+import Business from "./pages/business/Business";
+import { loader as businessLoader } from "./loaders/business";
 
 const router = createBrowserRouter([
   {
@@ -31,6 +33,12 @@ const router = createBrowserRouter([
         element: <User />,
         errorElement: <Error500 />,
         loader: userLoader,
+      },
+      {
+        path: "/negocios/listar",
+        element: <Business />,
+        errorElement: <Error500 />,
+        loader: businessLoader,
       },
       { path: "*", element: <Error404 /> },
     ],
