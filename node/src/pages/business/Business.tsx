@@ -1,12 +1,13 @@
 import { Link, useLoaderData } from "react-router-dom";
-import { Breadcrumb } from "react-bootstrap";
+import { Breadcrumb, Modal } from "react-bootstrap";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import Menu from "../../components/Menu";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import AuthContext from "../../context/AuthProvider";
 import type { Business } from "../../interfaces/Business";
 import CustomImage from "../../components/ui/CustomImage";
+import { findOne } from "../../services/business.api";
 
 const Business = () => {
   const context = useContext(AuthContext);
@@ -17,9 +18,36 @@ const Business = () => {
 
   const { data } = useLoaderData();
 
+  const [businessDetail, setBusinessDetail] = useState<Business | null>(null)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     checkAccess("1");
   });
+
+  const [show, setShow] = useState(false);
+  const handleShow = async (id: number) => {
+    setShow(true);
+    try {
+      setLoading(true);
+      const [data] = await findOne(id);
+      if (data.status.status_code !== 200) {
+        setError("Error al cargar la inforamción")
+      } else {
+        setBusinessDetail(data.response);
+        setShow(true);
+        setError(null);
+      }
+    } catch {
+      setError("Error al cargar la información")
+    } finally {
+      setLoading(false);
+    }
+  }
+  const handleClose = () => {
+    setShow(false);
+  }
 
   return (
     <div className="wrapper">
@@ -84,7 +112,8 @@ const Business = () => {
                               <td className="text-center">
                                 <button
                                   className="btn btn-sm"
-                                  title="Ver imagen"
+                                  onClick={()=>handleShow(business.id)}
+                                  title={`Ver Detalle ${business.name}`}
                                 >
                                   <i className="fas fa-search"></i>
                                 </button>
@@ -136,6 +165,73 @@ const Business = () => {
         </main>
         <Footer />
       </div>
+      <Modal show={show} onHide={handleClose} size="lg">
+        <Modal.Header closeButton>
+          {loading && "Cargando..."}
+          {!loading && error && <span className="text-danger">Error</span>}
+          {!loading && !error && (businessDetail?.name ?? "Sin Información...")}
+        </Modal.Header>
+        <Modal.Body>
+          {loading ? (
+            <div className="text-center">
+              <div className="spinner-border">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+          ) : (
+            <div className=".card.mb-3">
+              <table className="table table-bordered table-striped">
+                <tbody>
+                  {error ? (
+                    <tr>
+                      <td className="text-center text-danger" colSpan={2}>
+                        {error}
+                      </td>
+                    </tr>
+                  ) : (
+                    <>
+                      <tr>
+                        <th className="bg-light" style={{ width: "30%" }}>ID</th>
+                        <td>{businessDetail?.id}</td>
+                      </tr>
+                      <tr>
+                        <th className="bg-light">Nombre</th>
+                        <td>{businessDetail?.name}</td>
+                      </tr>
+                      <tr>
+                        <th className="bg-light">Categoría</th>
+                        <td>{businessDetail?.category}</td>
+                      </tr>
+                      <tr>
+                        <th className="bg-light">Correo</th>
+                        <td>{businessDetail?.email}</td>
+                      </tr>
+                      <tr>
+                        <th className="bg-light">Teléfono</th>
+                        <td>{businessDetail?.phone_number}</td>
+                      </tr>
+                      <tr>
+                        <th className="bg-light">Dirección</th>
+                        <td>{businessDetail?.address}</td>
+                      </tr>
+                      <tr>
+                        <th className="bg-light">Descripción</th>
+                        <td>{businessDetail?.description}</td>
+                        </tr>
+                        <tr>
+                          <th className="bg-light">Mapa</th>
+                          <td>
+                            <iframe loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={businessDetail?.location} width={600} height={600}></iframe>
+                          </td>
+                        </tr>
+                    </>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) }
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

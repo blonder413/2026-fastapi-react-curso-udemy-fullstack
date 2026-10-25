@@ -10,7 +10,7 @@ export interface Business {
   slug?: string;
   email: string;
   phone_number: string;
-  addess: string;
+  address: string;
   logo: string;
   location: string;
   description: string;
