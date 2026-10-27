@@ -6,11 +6,13 @@ import User from "./pages/User";
 import { loader as userLoader } from "./loaders/user";
 import Business from "./pages/business/Business";
 import { loader as businessLoader } from "./loaders/business";
+import { loader as businessLoaderForm } from "./loaders/business.form";
 import Error404 from "./pages/Error404";
 import Error500 from "./pages/Error500";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Frontend from "./components/Frontend";
+import BusinessForm from "./pages/business/BusinessForm";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +38,12 @@ const router = createBrowserRouter([
         element: <Business />,
         errorElement: <Error500 />,
         loader: businessLoader,
+      },
+      {
+        path: "/negocios/formulario",
+        element: <BusinessForm />,
+        errorElement: <Error500 />,
+        loader: businessLoaderForm,
       },
       { path: "*", element: <Error404 /> },
     ],

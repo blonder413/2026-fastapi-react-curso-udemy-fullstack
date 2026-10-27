@@ -67,12 +67,13 @@ const Business = () => {
               <div className="col-12 col-lg-12  d-flex">
                 <div className="card flex-fill">
                   <div className="card-header">
-                    <a
+                    <Link
                       className="btn btn-outline-primary float-end"
+                      to="/negocios/formulario?accion=1&id=0"
                       title="Crear"
                     >
                       <i className="fas fa-plus"></i> Crear
-                    </a>
+                    </Link>
                   </div>
 
                   <div className="card-body">
@@ -139,7 +140,7 @@ const Business = () => {
                                 </button>
                                 <Link
                                   className="btn btn-sm"
-                                  to={`/negocio/formulario?accion=2&id=${business.id}`}
+                                  to={`/negocios/formulario?accion=2&id=${business.id}`}
                                   title={`Editar ${business.name}`}
                                 >
                                   <i className="fas fa-edit text-primary"></i>
