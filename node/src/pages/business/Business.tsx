@@ -31,7 +31,7 @@ const Business = () => {
     setShow(true);
     try {
       setLoading(true);
-      const [data] = await findOne(id);
+      const data = await findOne(id);
       if (data.status.status_code !== 200) {
         setError("Error al cargar la inforamción")
       } else {
