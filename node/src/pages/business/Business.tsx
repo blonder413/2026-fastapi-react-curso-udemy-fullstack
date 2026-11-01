@@ -7,20 +7,28 @@ import { useContext, useEffect, useState } from "react";
 import AuthContext from "../../context/AuthProvider";
 import type { Business } from "../../interfaces/Business";
 import CustomImage from "../../components/ui/CustomImage";
-import { findOne } from "../../services/business.api";
+import { findOne, remove } from "../../services/business.api";
+import type { CustomAlertInterface } from "../../components/ui/CustomAlert";
+import CustomAlert from "../../components/ui/CustomAlert";
 
 const Business = () => {
   const context = useContext(AuthContext);
   if (!context) {
     return <h1>No fue posible cargar el contexto</h1>;
   }
-  const { checkAccess } = context;
+  const { checkAccess, showConfirm, setConfirmData } = context;
 
   const { data } = useLoaderData();
 
   const [businessDetail, setBusinessDetail] = useState<Business | null>(null)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [customAlert, setCustomAlert] = useState<CustomAlertInterface>({
+    state: false,
+    title: "",
+    detail: "",
+    headerBg: "bg-primary",
+  });
 
   useEffect(() => {
     checkAccess("1");
@@ -49,8 +57,43 @@ const Business = () => {
     setShow(false);
   }
 
+  const handleCloseModal = () => {
+    setCustomAlert((prev) => ({ ...prev, state: false }));
+  };
+
+  const handleDelete = async (id: number) => {
+    showConfirm({
+      title: "Eliminar",
+      detail: "¿Realmente desea eliminar este registro?",
+      headerBg: "bg-warning",
+      isConfirm: true,
+      onConfirm: async () => {
+        try {
+          await remove(id);
+          setCustomAlert({
+            state: true,
+            title: "Eliminado",
+            detail: "Registro eliminado exitosamente",
+            headerBg: "bg-success",
+          });
+          setTimeout(() => {
+            globalThis.location.href = location.href;
+          }, 2000);
+        } catch (error) {
+          setCustomAlert({
+            state: true,
+            title: "Error",
+            detail: "Error al eliminar el registro",
+            headerBg: "bg-danger",
+          });
+        }
+      },
+      onClose: () => setConfirmData(null),
+    });
+  };
+
   return (
-    <div className="wrapper">
+    <section className="wrapper">
       <Menu />
 
       <div className="main">
@@ -84,6 +127,7 @@ const Business = () => {
                             <th>ID</th>
                             <th>Estado</th>
                             <th>Categoría</th>
+                            <th>Usuarios</th>
                             <th>Nombre</th>
                             <th>Logo</th>
                             <th>Detalle</th>
@@ -104,6 +148,7 @@ const Business = () => {
                                 </span>
                               </td>
                               <td>{business.category}</td>
+                              <td>{ business.user }</td>
                               <td>{business.name}</td>
                               <td className="text-center">
                                 <CustomImage imagenUrl={business.logo} titulo={`Logo ${business.name}`} >
@@ -147,7 +192,7 @@ const Business = () => {
                                 </Link>
                                 <button
                                   className="btn btn-sm"
-                                  onClick={() => {}}
+                                  onClick={() => handleDelete(business.id)}
                                   title={`Eliminar ${business.name}`}
                                 >
                                   <i className="fas fa-trash text-primary"></i>
@@ -233,7 +278,14 @@ const Business = () => {
           ) }
         </Modal.Body>
       </Modal>
-    </div>
+      <CustomAlert
+        state={customAlert.state}
+        title={customAlert.title}
+        detail={customAlert.detail}
+        onClose={handleCloseModal}
+        headerBg={customAlert.headerBg}
+      />
+    </section>
   );
 };
 
