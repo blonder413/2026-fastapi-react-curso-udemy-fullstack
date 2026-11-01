@@ -175,7 +175,7 @@ async def show(id: int, session: Annotated[Session, Depends(get_session)]):
         data.logo = f"https://{os.getenv('S3_BUCKET_NAME')}.s3.{os.getenv('AWS_REGION')}.amazonaws.com/files/{data.logo}"
 
     response = BusinessInterface.model_validate(data).model_dump(
-        mode="json", exclude={"state_id", "category_id", "user_id"}
+        mode="json"
     )
 
     return JSONResponse(

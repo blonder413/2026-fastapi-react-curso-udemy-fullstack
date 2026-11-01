@@ -10,8 +10,10 @@ import type { Category } from "../../interfaces/Category.interface";
 import type { User } from "../../interfaces/User.interface";
 import type { CustomAlertInterface } from "../../components/ui/CustomAlert";
 import CustomAlert from "../../components/ui/CustomAlert";
-import { create } from "../../services/business.api";
+import { create, update } from "../../services/business.api";
 import type { Business } from "../../interfaces/Business";
+import type { State } from "../../interfaces/State.interface";
+import { findOne as findOneUser } from "../../services/user.api";
 
 const BusinessForm = () => {
   const context = useContext(AuthContext);
@@ -19,18 +21,22 @@ const BusinessForm = () => {
     return <h1>No fue posible cargar el contexto</h1>;
   }
   const { checkAccess } = context;
-
-  const { categories, users, action, id } = useLoaderData();
-
-  const [state_id, setState_id] = useState("0");
-  const [category_id, setCategory_id] = useState("0");
-  const [user_id, setUser_id] = useState("0");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone_number, setPhone_number] = useState("");
-  const [address, setAddress] = useState("");
-  const [location, setLocation] = useState("");
-  const [description, setDescription] = useState("");
+  const { business, categories, states, users, action, id } = useLoaderData();
+  const [stateId, setStateId] = useState(
+    action == "create" ? "0" : (business?.response?.state_id?.toString() ?? "0"),
+  );
+  const [category_id, setCategory_id] = useState(
+    action == "create" ? "0" : (business?.response?.category_id?.toString() ?? "0"),
+  );
+  const [user_id, setUser_id] = useState(
+    action == "create" ? "0" : (business?.response?.user_id?.toString() ?? "0"),
+  );
+  const [name, setName] = useState(action=="create"?"":business?.response?.name ?? "");
+  const [email, setEmail] = useState(action=="create"?"":business?.response?.email ?? "");
+  const [phone_number, setPhone_number] = useState(action=="create"?"":business?.response?.phone_number ?? "");
+  const [address, setAddress] = useState(action=="create"?"":business?.response?.address ?? "");
+  const [location, setLocation] = useState(action=="create"?"":business?.response?.location ?? "");
+  const [description, setDescription] = useState(action=="create"?"":business?.response?.description ?? "");
 
   const [customAlert, setCustomAlert] = useState<CustomAlertInterface>({
     state: false,
@@ -134,6 +140,49 @@ const BusinessForm = () => {
     return true;
   };
 
+  const handleEdit = async () => {
+    const validUser = await findOneUser(user_id);
+    if (validUser[0]?.response?.state_id != 1) {
+      setCustomAlert({
+        state: true,
+        title: "Error!",
+        detail: "El usuario no existe",
+        headerBg: "bg-danger",
+      });
+      return;
+    }
+
+    const dto: Business = {
+      id,
+      category_id: parseInt(category_id),
+      state_id: parseInt(stateId),
+      user_id: parseInt(user_id),
+      name,
+      email,
+      phone_number,
+      address,
+      location,
+      description,
+    };
+
+    const response = await update(dto);
+    if (response.status.status_code == 200) {
+      setCustomAlert({
+        state: true,
+        title: "Editado!",
+        detail: "Registro editado",
+        headerBg: "bg-success",
+      });
+    } else {
+      setCustomAlert({
+        state: true,
+        title: "Error!",
+        detail: "Ocurrió un error",
+        headerBg: "bg-danger",
+      });
+    }
+  }
+
   const handleSubmit = async (event: React.SubmitEvent) => {
     event.preventDefault();
 
@@ -142,7 +191,7 @@ const BusinessForm = () => {
       return;
     }
 
-    if (action == 1) {
+    if (action == "create") {
       const dto: Business = {
         category_id: parseInt(category_id),
         user_id: parseInt(user_id),
@@ -170,13 +219,12 @@ const BusinessForm = () => {
         });
       }
     } else {
-      console.debug("editar");
+      handleEdit();
     }
 
     setTimeout(() => {
       globalThis.location.href = "/negocios/listar";
     }, 2000);
-    // TODO: Save data
   };
 
   useEffect(() => {
@@ -195,20 +243,44 @@ const BusinessForm = () => {
               <Breadcrumb.Item href="/negocios/listar">
                 Negocios
               </Breadcrumb.Item>
-              <Breadcrumb.Item active>Crear</Breadcrumb.Item>
+              <Breadcrumb.Item active>
+                {action == "create"
+                  ? "Crear"
+                  : `Editar ${business?.response.name}`}
+              </Breadcrumb.Item>
             </Breadcrumb>
-            <h1 className="h3 mb-3">Negocios</h1>
+            <h1 className="h3 mb-3">{business?.response.name}</h1>
             <div className="row">
               <div className="col-12 col-lg-12  d-flex">
                 <div className="card flex-fill">
                   <div className="card-body">
                     <Form onSubmit={handleSubmit}>
+                      {action == "edit" && (
+                        <div className="col-lg-3">
+                          <label htmlFor="state_id">Estado</label>
+                          <select
+                            className="form-control"
+                            id="state_id"
+                            value={stateId}
+                            onChange={(e) => {
+                              setStateId(e.target.value);
+                            }}
+                          >
+                            {states.response.map((state: State) => (
+                              <option key={state.id} value={state.id}>
+                                {state.nombre}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+
                       <div className="col-lg-3">
                         <label htmlFor="user_id">Usuario</label>
                         <select
                           className="form-control"
                           id="user_id"
-                          value={user_id}
+                          value={String(user_id ?? "0")}
                           onChange={(e) => {
                             setUser_id(e.target.value);
                           }}
@@ -338,8 +410,18 @@ const BusinessForm = () => {
 
                       <div>
                         <div className="col-lg-3 d-flex justify-content-end">
-                          <button className="btn btn-primary mt-3">
-                            <i className="fas fa-plus"></i> Crear
+                          <button
+                            className={`btn btn-${action == "create" ? "primary" : "secondary"} mt-3`}
+                          >
+                            {action == "create" ? (
+                              <>
+                                <i className="fas fa-plus"></i> Crear
+                              </>
+                            ) : (
+                              <>
+                                <i className="fas fa-pencil-alt"></i> Editar
+                              </>
+                            )}
                           </button>
                         </div>
                       </div>

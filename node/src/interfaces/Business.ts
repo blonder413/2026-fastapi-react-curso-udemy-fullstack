@@ -11,7 +11,7 @@ export interface Business {
   email: string;
   phone_number: string;
   address: string;
-  logo: string;
+  logo?: string;
   location: string;
   description: string;
   date?: string;

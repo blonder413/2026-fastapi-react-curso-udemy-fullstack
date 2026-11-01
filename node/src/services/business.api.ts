@@ -10,7 +10,7 @@ export const findOne = async (id: number) => {
       Authorization: authorization,
     },
   });
-  return [await response.json(), response.status];
+  return await response.json();
 };
 
 export const findAll = async () => {

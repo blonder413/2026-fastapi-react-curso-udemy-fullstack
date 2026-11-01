@@ -69,7 +69,7 @@ const Business = () => {
                   <div className="card-header">
                     <Link
                       className="btn btn-outline-primary float-end"
-                      to="/negocios/formulario?accion=1&id=0"
+                      to="/negocios/formulario?accion=create&id=0"
                       title="Crear"
                     >
                       <i className="fas fa-plus"></i> Crear
@@ -140,7 +140,7 @@ const Business = () => {
                                 </button>
                                 <Link
                                   className="btn btn-sm"
-                                  to={`/negocios/formulario?accion=2&id=${business.id}`}
+                                  to={`/negocios/formulario?accion=edit&id=${business.id}`}
                                   title={`Editar ${business.name}`}
                                 >
                                   <i className="fas fa-edit text-primary"></i>
