@@ -127,7 +127,7 @@ const Business = () => {
                             <th>ID</th>
                             <th>Estado</th>
                             <th>Categoría</th>
-                            <th>Usuarios</th>
+                            <th>Usuario</th>
                             <th>Nombre</th>
                             <th>Logo</th>
                             <th>Detalle</th>

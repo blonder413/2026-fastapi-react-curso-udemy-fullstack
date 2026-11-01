@@ -21,7 +21,7 @@ const CustomImage = ({
   return (
     <>
       {/* Elemento que activará el modal (puede ser cualquier cosa) */}
-      <button className='btn btn-sm' onClick={handleShow} style={{ cursor: 'pointer' }}>
+      <button className='btn btn-sm' onClick={handleShow} style={{ cursor: 'pointer' }} aria-label='Mostrar imagen'>
         {children}
       </button>
 
@@ -37,6 +37,7 @@ const CustomImage = ({
             onError={(e) => {
               (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x200?text=Imagen+no+disponible';
             }}
+            title={ titulo }
           />
         </Modal.Body>
       </Modal>
