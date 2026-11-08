@@ -7,9 +7,10 @@ import { useContext, useEffect, useState } from "react";
 import AuthContext from "../../context/AuthProvider";
 import type { Business } from "../../interfaces/Business";
 import CustomImage from "../../components/ui/CustomImage";
-import { findOne, remove } from "../../services/business.api";
+import { findOne, remove, setLogo } from "../../services/business.api";
 import type { CustomAlertInterface } from "../../components/ui/CustomAlert";
 import CustomAlert from "../../components/ui/CustomAlert";
+import ModalLogo from "./ModalLogo";
 
 const Business = () => {
   const context = useContext(AuthContext);
@@ -20,7 +21,7 @@ const Business = () => {
 
   const { data } = useLoaderData();
 
-  const [businessDetail, setBusinessDetail] = useState<Business | null>(null)
+  const [businessDetail, setBusinessDetail] = useState<Business | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [customAlert, setCustomAlert] = useState<CustomAlertInterface>({
@@ -41,21 +42,92 @@ const Business = () => {
       setLoading(true);
       const data = await findOne(id);
       if (data.status.status_code !== 200) {
-        setError("Error al cargar la inforamción")
+        setError("Error al cargar la inforamción");
       } else {
         setBusinessDetail(data.response);
         setShow(true);
         setError(null);
       }
     } catch {
-      setError("Error al cargar la información")
+      setError("Error al cargar la información");
     } finally {
       setLoading(false);
     }
-  }
+  };
   const handleClose = () => {
     setShow(false);
-  }
+  };
+
+  const [showLogoForm, setShowLogoForm] = useState(false);
+  const handleCloseLogoForm = () => {
+    setShowLogoForm(false);
+  };
+  const handleShowLogoForm = (data: Business) => {
+    setBusinessDetail(data);
+    setShowLogoForm(true);
+  };
+  const handleSubmitLogoForm = async (
+    e: React.SubmitEvent<HTMLFormElement>,
+  ) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const fileInput = formData.get("photo") as File;
+    if (!fileInput || fileInput.size === 0) {
+      setCustomAlert({
+        state: true,
+        title: "Error",
+        detail: "Debe seleccionar un archivo",
+        headerBg: "bg-danger",
+      });
+      return;
+    }
+
+    const allowedTypes = ["image/jpeg", "image/png"];
+    if (!allowedTypes.includes(fileInput.type)) {
+      setCustomAlert({
+        state: true,
+        title: "Error",
+        detail: "Solo se permiten imágenes jpeg, png",
+        headerBg: "bg-danger",
+      });
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024;
+    if (fileInput.size > maxSize) {
+      setCustomAlert({
+        state: true,
+        title: "Error",
+        detail: "Solo se permite máximo 5MB",
+        headerBg: "bg-danger",
+      });
+      return;
+    }
+
+    try {
+      await setLogo(businessDetail.id, fileInput);
+      setCustomAlert({
+        state: true,
+        title: "Archivo subido",
+        detail: "Archivo cargado correctamente",
+        headerBg: "bg-success",
+      });
+      setTimeout(() => {
+        globalThis.location.reload();
+      }, 2000);
+    } catch (error) {
+      setCustomAlert({
+        state: true,
+        title: "Error",
+        detail:
+          error instanceof Error ? error.message : "Error al subir el archivo",
+        headerBg: "bg-danger",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCloseModal = () => {
     setCustomAlert((prev) => ({ ...prev, state: false }));
@@ -148,17 +220,23 @@ const Business = () => {
                                 </span>
                               </td>
                               <td>{business.category}</td>
-                              <td>{ business.user }</td>
+                              <td>{business.user}</td>
                               <td>{business.name}</td>
                               <td className="text-center">
-                                <CustomImage imagenUrl={business.logo} titulo={`Logo ${business.name}`} >
-                                  <i className="fas fa-image" title={business.name}></i>
+                                <CustomImage
+                                  imagenUrl={business.logo}
+                                  titulo={`Logo ${business.name}`}
+                                >
+                                  <i
+                                    className="fas fa-image"
+                                    title={business.name}
+                                  ></i>
                                 </CustomImage>
                               </td>
                               <td className="text-center">
                                 <button
                                   className="btn btn-sm"
-                                  onClick={()=>handleShow(business.id)}
+                                  onClick={() => handleShow(business.id)}
                                   title={`Ver Detalle ${business.name}`}
                                 >
                                   <i className="fas fa-search"></i>
@@ -178,7 +256,7 @@ const Business = () => {
                               <td>
                                 <button
                                   className="btn btn-sm"
-                                  onClick={() => {}}
+                                  onClick={() => handleShowLogoForm(business)}
                                   title={`Editar logo ${business.name}`}
                                 >
                                   <i className="fas fa-upload text-primary"></i>
@@ -237,7 +315,9 @@ const Business = () => {
                   ) : (
                     <>
                       <tr>
-                        <th className="bg-light" style={{ width: "30%" }}>ID</th>
+                        <th className="bg-light" style={{ width: "30%" }}>
+                          ID
+                        </th>
                         <td>{businessDetail?.id}</td>
                       </tr>
                       <tr>
@@ -263,21 +343,33 @@ const Business = () => {
                       <tr>
                         <th className="bg-light">Descripción</th>
                         <td>{businessDetail?.description}</td>
-                        </tr>
-                        <tr>
-                          <th className="bg-light">Mapa</th>
-                          <td>
-                            <iframe loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={businessDetail?.location} width={600} height={600}></iframe>
-                          </td>
-                        </tr>
+                      </tr>
+                      <tr>
+                        <th className="bg-light">Mapa</th>
+                        <td>
+                          <iframe
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            src={businessDetail?.location}
+                            width={600}
+                            height={600}
+                          ></iframe>
+                        </td>
+                      </tr>
                     </>
                   )}
                 </tbody>
               </table>
             </div>
-          ) }
+          )}
         </Modal.Body>
       </Modal>
+      <ModalLogo
+        business={businessDetail}
+        show={showLogoForm}
+        handleClose={handleCloseLogoForm}
+        handleSubmit={handleSubmitLogoForm}
+      />
       <CustomAlert
         state={customAlert.state}
         title={customAlert.title}

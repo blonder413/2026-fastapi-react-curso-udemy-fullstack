@@ -1,7 +1,8 @@
 import { authorization } from "../constants/authorization";
 import type { Business } from "../interfaces/Business";
 
-const base_url = import.meta.env.VITE_API_URL + "/business";
+const api_url = import.meta.env.VITE_API_URL
+const base_url = api_url + "/business";
 
 export const findOne = async (id: number) => {
   const response = await fetch(`${base_url}/${id}`, {
@@ -56,4 +57,23 @@ export const remove = async (id: number) => {
     method: "DELETE",
   });
   return response.json();
+};
+
+export const setLogo = async (id: number, file: File) => {
+  const formData = new FormData();
+  formData.append("id", id.toString());
+  formData.append("file", file);
+  try {
+    const response = await fetch(`${api_url}/business-logo`, {
+      body: formData,
+      headers: {
+        Authorization: authorization,
+      },
+      method: "POST",
+    });
+    return response.json();
+  } catch {
+    console.error("Error al subir el logo");
+    throw new Error("Error al subir el logo");
+  }
 };
