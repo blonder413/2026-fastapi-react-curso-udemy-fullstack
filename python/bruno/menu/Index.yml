@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8050/menu/business-updated
+  url: http://localhost:8050/menu/tricell
   auth: inherit
 
 settings:
@@ -13,3 +13,4 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+  forwardAuthorizationHeader: true

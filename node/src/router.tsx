@@ -13,6 +13,8 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Frontend from "./components/Frontend";
 import BusinessForm from "./pages/business/BusinessForm";
+import Menu from "./pages/Menu";
+import { loader as menuLoader } from "./loaders/menu";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +49,12 @@ const router = createBrowserRouter([
       },
       { path: "*", element: <Error404 /> },
     ],
+  },
+  {
+    path: "/carta/:slug",
+    element: <Menu />,
+    loader: menuLoader,
+    errorElement: <Error500 />,
   },
   {
     path: "/restablecer",
