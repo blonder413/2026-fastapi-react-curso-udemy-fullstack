@@ -5,6 +5,7 @@ export interface Plate {
   price: number;
   photo: string;
   platesCategory: string;
+  plate_category?: string;
 }
 
 export interface PlateMenu {

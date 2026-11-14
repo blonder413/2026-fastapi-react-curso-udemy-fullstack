@@ -22,6 +22,7 @@ const BusinessForm = () => {
   }
   const { checkAccess } = context;
   const { business, categories, states, users, action, id } = useLoaderData();
+
   const [stateId, setStateId] = useState(
     action == "create" ? "0" : (business?.response?.state_id?.toString() ?? "0"),
   );
