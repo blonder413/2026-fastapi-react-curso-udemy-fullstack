@@ -56,6 +56,18 @@ const Menu = () => {
             <span className="align-middle">Negocios</span>
           </Link>
         </li>
+        <li
+          className={`sidebar-item ${isActive("/negocios/platos-categorias") ? "active" : ""}`}
+        >
+          <Link
+            to="/negocios/platos-categorias"
+            className="sidebar-link"
+            title="Platos categorías"
+          >
+            <i className="align-middle fas fa-utensils"></i>
+            <span className="align-middle">Platos categorías</span>
+          </Link>
+        </li>
       </>
     );
   };

@@ -77,7 +77,7 @@ async def create(
             content={
                 "status": {
                     "status_code": status.HTTP_400_BAD_REQUEST,
-                    "message": "Not Found",
+                    "message": "Exists",
                 },
                 "response": {},
             },

@@ -15,6 +15,8 @@ import Frontend from "./components/Frontend";
 import BusinessForm from "./pages/business/BusinessForm";
 import Menu from "./pages/Menu";
 import { loader as menuLoader } from "./loaders/menu";
+import PlateCategory from "./pages/business/PlateCategory";
+import { loader as plateCategoryLoader } from "./loaders/plate-category";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +48,12 @@ const router = createBrowserRouter([
         element: <BusinessForm />,
         errorElement: <Error500 />,
         loader: businessLoaderForm,
+      },
+      {
+        path: "/negocios/platos-categorias",
+        element: <PlateCategory />,
+        errorElement: <Error500 />,
+        loader: plateCategoryLoader,
       },
       { path: "*", element: <Error404 /> },
     ],
