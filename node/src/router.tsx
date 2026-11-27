@@ -17,8 +17,10 @@ import Menu from "./pages/Menu";
 import { loader as menuLoader } from "./loaders/menu";
 import PlateCategory from "./pages/business/PlateCategory";
 import { loader as plateCategoryLoader } from "./loaders/plate-category";
+import Plate from "./pages/client/Plate";
+import { loader as plateLoader } from "./loaders/plate";
 
-const router = createBrowserRouter([
+const routes = [
   {
     path: "/",
     element: <Frontend />,
@@ -55,6 +57,12 @@ const router = createBrowserRouter([
         errorElement: <Error500 />,
         loader: plateCategoryLoader,
       },
+      {
+        path: "/mi-negocio",
+        element: <Plate />,
+        errorElement: <Error500 />,
+        loader: plateLoader,
+      },
       { path: "*", element: <Error404 /> },
     ],
   },
@@ -73,6 +81,7 @@ const router = createBrowserRouter([
     element: <UpdatePassword />,
     errorElement: <Error500 />,
   },
-]);
+];
 
+const router = createBrowserRouter(routes);
 export default router;

@@ -5,7 +5,7 @@ interface ModalLogoProps {
   business: Business;
   show: boolean;
   handleClose: () => void;
-  handleSubmit: () => void;
+  handleSubmit: (e: React.SubmitEvent<HTMLFormElement>) => Promise<void>;
 }
 
 const ModalLogo = ({

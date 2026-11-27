@@ -1,8 +1,18 @@
 import { authorization } from "../constants/authorization";
 import type { Business } from "../interfaces/Business";
 
-const api_url = import.meta.env.VITE_API_URL
+const api_url = import.meta.env.VITE_API_URL;
 const base_url = api_url + "/business";
+
+export const findByUser = async (id: number) => {
+  const response = await fetch(`${api_url}/business-by-user/${id}`, {
+    headers: {
+      "content-type": "application/json",
+      Authorization: authorization,
+    },
+  });
+  return await response.json();
+};
 
 export const findOne = async (id: number) => {
   const response = await fetch(`${base_url}/${id}`, {
